@@ -1,0 +1,19 @@
+{
+  "sessions.rightPaneTools.plan": "计划",
+  "settings.constants.pages.directory.label": "用户目录",
+  "settings.directorySettings.title": "用户目录",
+  "settings.settingsSearch.directory.directory.title": "用户目录",
+  "sessions.sessionDetailLayout.missionLeadFileTabName": "协调智能体",
+  "softwareFactory.softwareFactoryWorkstreamTaskViewUtils.facts.stage": "阶段",
+  "settings.auditLogSettings.system": "系统",
+  "pullRequestReview.pullRequestSearchFilters.statuses.open": "未关闭",
+  "components.analytics.workItemStatusIcon.status.open": "未关闭",
+  "components.layout.pullRequestSummaryRow.states.open": "未关闭",
+  "components.layout.sessionListV2FilterMenu.pullRequestOptions.open": "未关闭",
+  "components.layout.pullRequestControls.stateLabels.open": "未关闭的拉取请求",
+  "components.settings.modelAccessTable.required": "必需",
+  "components.lessons.lessonConnectors.required": "必需",
+  "settings.viewHistoryModal.view": "查看",
+  "settings.worktreesSettings.view": "查看",
+  "components.layout.sessionListV2ViewDialog.icons.bell": "铃铛"
+}

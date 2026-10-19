@@ -13,9 +13,9 @@ function fixture() {
   const empty = { header: { files: {} }, bytes: Buffer.alloc(0), base: 0 };
   const files = {
     'package.json': '{"version":"0.201.0"}',
-    '.vite/renderer/main_window/assets/index.js': 'const iZe=[Ju.English,Ju.Japanese,Ju.Korean];const YSu={[Ju.Japanese]:()=>1};eon();y9o.createRoot(document.body);',
+    '.vite/renderer/main_window/assets/index.js': 'const iZe=[Ju.English,Ju.Japanese,Ju.Korean];const YSu={[Ju.Japanese]:()=>1};eon();y9o.createRoot(document.getElementById("root")).render(c.jsx(Pfc,{env:u7t,children:c.jsx(Jju,{})}));',
     '.vite/build/main.js': 'const v3=[Se.English,Se.Japanese,Se.Korean];const rC={[Se.English]:nC,[Se.Japanese]:{desktop:{}}};',
-    '.vite/renderer/main_window/index.html': '<script>var messages = {en:[]};</script>',
+    '.vite/renderer/main_window/index.html': '<script>var messages = {en:[]};var locale = \'en\';</script>',
     'unrelated.bin': 'UNTOUCHED',
   };
   const asar = writeAsar(empty, new Map(Object.entries(files).map(([key, value]) => [key, Buffer.from(value)])));
@@ -136,6 +136,8 @@ test('the shipped pack has a valid digest and publishes its actual coverage', as
   assert.equal(digest, sha256(Buffer.from(JSON.stringify(contents))));
   assert.equal(pack.locale, 'zh-CN');
   assert.equal(pack.desktop.desktop.quitGuard.title, '退出 Factory？');
-  assert.ok(pack.coverage.renderer.translated < pack.coverage.renderer.total);
-  assert.equal(pack.coverage.desktop.translated, pack.coverage.desktop.total);
+  assert.equal(pack.coverage.renderer.covered, pack.coverage.renderer.total);
+  assert.equal(pack.coverage.desktop.covered, pack.coverage.desktop.total);
+  assert.equal(pack.coverage.renderer.translated + pack.coverage.renderer.preserved, pack.coverage.renderer.total);
+  assert.equal(pack.coverage.hardcoded.unresolved, 0);
 });

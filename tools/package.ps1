@@ -6,7 +6,7 @@ New-Item -ItemType Directory -Path $taskDist -Force | Out-Null
 $taskStage = Join-Path $taskDist ('stage-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $taskStage | Out-Null
 try {
-    $taskFiles = @('README.md', 'LICENSE', 'CHANGELOG.md', 'factory-zh.ps1', 'install.cmd', 'restore.cmd', 'status.cmd', 'pack\zh-CN.json', 'profiles\0.201.0.json', 'tools\cli.mjs', 'tools\install.mjs', 'tools\patch.mjs', 'tools\asar.mjs', 'docs\screenshots\login-zh-CN.png')
+    $taskFiles = @('README.md', 'LICENSE', 'CHANGELOG.md', 'factory-zh.ps1', 'install.cmd', 'restore.cmd', 'status.cmd', 'pack\zh-CN.json', 'profiles\0.201.0.json', 'tools\cli.mjs', 'tools\install.mjs', 'tools\patch.mjs', 'tools\hardcoded.mjs', 'tools\asar.mjs', 'docs\screenshots\login-zh-CN.png')
     foreach ($taskFile in $taskFiles) {
         $taskDestination = Join-Path $taskStage $taskFile
         New-Item -ItemType Directory -Path (Split-Path -Parent $taskDestination) -Force | Out-Null

@@ -3,18 +3,36 @@ import { execFileSync } from 'node:child_process';
 import { sha256 } from './asar.mjs';
 import { flatten, placeholders } from './catalog.mjs';
 import assert from 'node:assert/strict';
+import { readFullCatalog } from './full-catalog.mjs';
+import { adapterDigest } from './patch.mjs';
 
 const pack = JSON.parse(await readFile('pack/zh-CN.json'));
 const profile = JSON.parse(await readFile('profiles/0.201.0.json'));
 const phrases = await readFile('translations/phrases.tsv', 'utf8');
 const overrides = JSON.parse(await readFile('translations/overrides.json'));
 const desktop = JSON.parse(await readFile('translations/desktop.json'));
-const adapterSha256 = sha256(await readFile('tools/patch.mjs'));
-const inputs = sha256(Buffer.from(JSON.stringify({ profile, phrases, overrides, desktop, adapterSha256 })));
+const contextOverrides = JSON.parse(await readFile('translations/context-overrides.json'));
+const hardcodedProfile = JSON.parse(await readFile('profiles/0.201.0.hardcoded.json'));
+const badges = JSON.parse(await readFile('translations/badges.json'));
+const full = await readFullCatalog();
+assert.equal(full.missing.length, 0, '全量词典仍有缺项');
+assert.equal(full.failures.length, 0, JSON.stringify(full.failures));
+const adapterSha256 = await adapterDigest();
+const inputs = sha256(Buffer.from(JSON.stringify({ profile, phrases, overrides, contextOverrides, desktop, hardcodedProfile, badges, full: { inventory: full.inventory, translations: full.translations, preserved: full.preserved }, adapterSha256 })));
 assert.equal(pack.inputsSha256, inputs, '译文或适配器已变化，需要 npm run build');
 assert.equal(pack.adapterSha256, adapterSha256);
-assert.equal(pack.coverage.renderer.translated, Object.keys(flatten(pack.resources)).length);
-assert.equal(pack.coverage.desktop.translated, Object.keys(flatten(pack.desktop)).length);
+const { hardcoded, ...renderer } = pack.resources;
+const { hardcoded: nativeHardcoded, ...native } = pack.desktop.desktop;
+assert.deepEqual(Object.keys(flatten(renderer)).sort(), Object.keys(full.inventory.renderer).sort());
+assert.deepEqual(Object.keys(flatten({ desktop: native })).sort(), Object.keys(full.inventory.desktop).sort());
+assert.equal(pack.coverage.renderer.covered, 17851);
+assert.equal(pack.coverage.desktop.covered, 85);
+assert.equal(pack.coverage.renderer.covered, pack.coverage.renderer.total);
+assert.equal(pack.coverage.desktop.covered, pack.coverage.desktop.total);
+assert.equal(pack.coverage.hardcoded.unresolved, 0);
+assert.equal(pack.hardcoded.entries.length, pack.coverage.hardcoded.localized);
+assert.equal(Object.keys(hardcoded).length, pack.coverage.hardcoded.rendererResources);
+assert.equal(Object.keys(nativeHardcoded).length, pack.coverage.hardcoded.desktopResources);
 assert.equal(pack.version, JSON.parse(await readFile('package.json')).version);
 const seen = new Set();
 for (const line of phrases.split(/\r?\n/)) {
@@ -24,5 +42,5 @@ for (const line of phrases.split(/\r?\n/)) {
   seen.add(source);
   assert.deepEqual(placeholders(source), placeholders(target), `占位符不匹配：${source}`);
 }
-for (const path of ['tools/asar.mjs', 'tools/patch.mjs', 'tools/install.mjs', 'tools/cli.mjs', 'tools/catalog.mjs', 'tools/build-pack.mjs', 'tools/check.mjs', 'tools/extract-i18n.mjs']) execFileSync(process.execPath, ['--check', path], { stdio: 'inherit' });
-console.log(`译文、占位符、构建输入及脚本检查通过；${pack.coverage.renderer.translated} 条界面译文、${pack.coverage.desktop.translated} 条原生译文。`);
+for (const path of ['tools/asar.mjs', 'tools/patch.mjs', 'tools/install.mjs', 'tools/cli.mjs', 'tools/catalog.mjs', 'tools/build-pack.mjs', 'tools/check.mjs', 'tools/extract-i18n.mjs', 'tools/hardcoded.mjs', 'tools/quality.mjs', 'tools/full-catalog.mjs']) execFileSync(process.execPath, ['--check', path], { stdio: 'inherit' });
+console.log(`全量词典、保留说明、格式、构建输入及脚本检查通过；界面覆盖 ${pack.coverage.renderer.covered} 项，原生覆盖 ${pack.coverage.desktop.covered} 项。`);

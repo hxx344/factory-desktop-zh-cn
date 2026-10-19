@@ -1,0 +1,297 @@
+# Additional local UI labels and helper text outside the vendor resource table.
+20% off	优惠 20%
+50% off	优惠 50%
+50% off, launch discount	首发优惠 50%
+60% off	优惠 60%
+A host firewall or endpoint-protection product is filtering loopback (127.0.0.1) connections. The fix is on the user's machine -- usually a host firewall rule allowing localhost-to-localhost on the daemon port.	主机防火墙或终端防护软件正在过滤回环（127.0.0.1）连接。需要在用户计算机上处理，通常应添加主机防火墙规则，允许通过守护进程端口进行本机到本机的连接。
+A kernel-level filter (typically EDR -- CrowdStrike, SentinelOne, Defender ATP, etc.) is blocking process introspection. This is not itself fatal -- Factory routes around it -- but tell IT in case other diagnostics in this list also fail, to confirm the EDR posture.	内核级过滤器（通常是 CrowdStrike、SentinelOne、Defender ATP 等 EDR 软件）正在阻止进程检查。Factory 会绕过此限制，单独出现此项不会导致运行失败。如果列表中还有其他诊断失败，请联系 IT 确认 EDR 配置。
+A reproducible setup lets Droid run your code the way you do.	可复现的环境让 Droid 能以与你相同的方式运行代码。
+AGENTS.md gives Droid the know-how your team carries in its head.	AGENTS.md 向 Droid 提供团队积累的工作知识。
+API base	API 基础地址
+API format	API 格式
+AWS auth refresh command (optional)	AWS 身份验证刷新命令（可选）
+AWS credentials	AWS 凭据
+AWS profile (optional)	AWS 配置文件（可选）
+AWS region	AWS 区域
+Agent error	智能体错误
+Analytics show Droid whether a change helped your users.	分析数据让 Droid 了解更改是否改善了用户体验。
+Another HTTP server is bound to the daemon port. Factory will attempt to terminate it on next restart; if the problem persists, reboot to clear it.	另一个 HTTP 服务器占用了守护进程端口。Factory 将在下次重启时尝试结束它；若问题仍然存在，请重启计算机以释放端口。
+Another application has bound Factory's daemon port. Quit that application or reboot to free the port.	其他应用占用了 Factory 守护进程端口。请退出该应用或重启计算机以释放端口。
+Approve and create it	批准并创建
+Aqua	水蓝
+Authentication	身份验证
+Auto-update feed	自动更新源
+Auto-updates will not be delivered. Allow-list downloads.factory.ai if your IT policy gates that hostname.	无法获取自动更新。若 IT 策略限制此主机名，请将 downloads.factory.ai 加入允许名单。
+Automation files missing	自动化文件缺失
+Automation paused	自动化已暂停
+Automations API disabled	自动化 API 已禁用
+Base URL	基础 URL
+Bedrock API key from environment	使用环境变量中的 Bedrock API 密钥
+Bedrock authentication	Bedrock 身份验证
+Bedrock endpoint (optional)	Bedrock 端点（可选）
+Bedrock request metadata	Bedrock 请求元数据
+Blush	浅粉
+Bot already replied	机器人已回复
+Browse the starters	浏览入门模板
+Build and run it	构建并运行
+Capped	已达上限
+Chaining failed	串联失败
+Clear build commands let Droid prove its change compiles.	明确的构建命令让 Droid 能验证更改可以编译。
+Closed before completion	完成前已关闭
+Code review with Droid	使用 Droid 审查代码
+Compute limit exceeded	超出计算资源上限
+Computer needs update	计算机需要更新
+Computer not active	计算机未处于活跃状态
+Computer offline	计算机离线
+Computer over capacity	计算机已超出容量
+Computer paused	计算机已暂停
+Computer target missing	缺少目标计算机
+Computer unresponsive	计算机无响应
+Conjure sign-in	登录 Conjure
+Credential helper command	凭据辅助命令
+Credential refresh interval (ms)	凭据刷新间隔（毫秒）
+Custom delegation instructions	自定义委派指令
+Custom model ID (optional)	自定义模型 ID（可选）
+DNS resolution	DNS 解析
+Daemon /health endpoint	守护进程 /health 端点
+Daemon binary & log paths	守护进程程序及日志路径
+Daemon never started. See "Daemon process state" above.	守护进程从未启动。请查看上方的“守护进程状态”。
+Daemon process state	守护进程状态
+Deduped	已去重
+Defaults to 300000 ms (5 minutes). FACTORY_API_KEY_HELPER_TTL_MS takes precedence.	默认 300000 毫秒（5 分钟）。FACTORY_API_KEY_HELPER_TTL_MS 的设置优先。
+Delivery interrupted	投递已中断
+Delivery to session failed	投递到会话失败
+Delivery to session turned off	已关闭会话投递
+Diagnostics runner	诊断执行器
+Dispatch exception	调度异常
+Dispatch failed	调度失败
+Dispatch skipped	已跳过调度
+Dispatch timed out	调度超时
+Dispatched	已调度
+Display name (optional)	显示名称（可选）
+Droid Computer misconfigured	Droid 计算机配置有误
+Droid Computer or Remote Control?	Droid 计算机还是远程控制？
+Droid Computers & Remote Control	Droid 计算机与远程控制
+Droid Essentials	Droid 基础课程
+Droid Master	Droid 大师
+Droid Specialist	Droid 专家
+Endpoint protection detection	终端防护检测
+Endpoint-protection software is present. If the daemon is crashing with NTSTATUS codes, these products may be the cause.	检测到终端防护软件。若守护进程崩溃并返回 NTSTATUS 代码，这些软件可能是原因。
+Environment variable	环境变量
+Excluded author	作者已被排除
+Excluded keyword	关键词已被排除
+Execution not entitled	没有执行权限
+Exit code analysis	退出码分析
+Extra request arguments (JSON object)	额外请求参数（JSON 对象）
+Extra request headers	额外请求头
+FAIL	失败
+Factory API is unreachable. Allow-list *.factory.ai for outbound HTTPS.	无法连接 Factory API。请允许向 *.factory.ai 发出 HTTPS 连接。
+Factory uses WorkOS for sign-in; sign-in will fail if api.workos.com is blocked. Allow-list api.workos.com for outbound HTTPS.	Factory 使用 WorkOS 登录；若 api.workos.com 被拦截，登录将失败。请允许向 api.workos.com 发出 HTTPS 连接。
+Feature disabled	功能已禁用
+Fetch Content	获取内容
+Filtered	已筛选
+Find its first run	查看首次运行
+Find your goal	查找目标
+Find your wikis	查找知识库
+First Item	第一项
+Fix one finding	修复一个发现的问题
+Fix one gap	补齐一处缺漏
+Fix the top issue	修复最重要的问题
+Follow one bug through	跟进一个缺陷的完整流程
+Guardrails keep Droid’s fast changes safe.	防护措施保障 Droid 快速修改的安全性。
+Hand it a first task	向它分配第一个任务
+Headers sent with requests to this model.	向此模型发送请求时附带的请求头。
+Host slept	主机已休眠
+How this model appears in the model picker	此模型在模型选择器中显示的名称
+How your level is set	你的等级如何确定
+Identifier for programmatic access in Droid. Useful when configurations share the same provider Model ID.	通过程序访问 Droid 时使用的标识。多个配置使用同一提供商模型 ID 时尤其有用。
+Image	图片
+Image support override	覆盖图像支持设置
+Images not supported	不支持图像
+Images supported	支持图像
+Initial run failed	首次运行失败
+Input-token limit used to determine when Droid compacts the conversation.	用于确定 Droid 何时压缩对话的输入 Token 上限。
+Instructions that stand alone	自包含的指令
+Invalid payload regex	载荷正则表达式无效
+JWT access token	JWT 访问令牌
+Keep it fresh	持续更新
+Keep stored credential	保留已保存的凭据
+Keyword not matched	关键词未匹配
+Know what you approve	了解你批准的操作
+Last failure hypothesis	最近一次失败的可能原因
+Lavender	薰衣草紫
+Likely environmental -- a system DLL or injected hook is failing. IT should check endpoint-protection compatibility.	可能由环境问题引起：系统 DLL 或注入的钩子发生故障。请 IT 检查终端防护软件的兼容性。
+Linters and type checkers catch Droid’s slips in seconds.	代码检查和类型检查能迅速发现 Droid 的疏漏。
+Logs and traces show Droid what your code really does.	日志和跟踪信息让 Droid 了解代码实际如何运行。
+Loopback reachability (127.0.0.1)	回环连接可达性（127.0.0.1）
+MCP auth required	MCP 需要身份验证
+MCP unavailable	MCP 不可用
+Machine out of resources	计算机资源不足
+Marked as degraded	已标记为降级
+Matcha	抹茶绿
+Max context limit (optional)	上下文长度上限（可选）
+Max output tokens (optional)	输出 Token 上限（可选）
+Maximum automatically retained worktrees	自动保留的工作树数量上限
+Maximum number of tokens in a model response. Leave blank to use the default.	模型响应的 Token 数量上限。留空使用默认值。
+Merge request	合并请求
+Message from bot	来自机器人的消息
+Message from human	来自人的消息
+Metadata sent with each Bedrock request. Environment references resolve locally.	随每次 Bedrock 请求发送的元数据。环境变量引用在本地解析。
+Midnight	午夜
+Missed runs	错过的运行
+Missed runs (deleted)	错过的运行（已删除）
+Missed runs (paused)	错过的运行（已暂停）
+Missed runs (recovered)	错过的运行（已恢复）
+Missed runs (schedule changed)	错过的运行（计划已更改）
+Missed schedule	错过计划
+Model timed out	模型超时
+Most recent stale-daemon outcome	最近一次过期守护进程处理结果
+Network error	网络错误
+No API credential	不使用 API 凭据
+No assistant response	助手没有响应
+No target configured	未配置目标
+Ongoing or one-off?	持续运行还是仅运行一次？
+Open Compute	开放计算
+OpenAI-compatible (Chat Completions)	兼容 OpenAI（Chat Completions）
+Org deactivated	组织已停用
+Other provider	其他提供商
+Outbound HTTPS to public IPs is unexpected to fail. Check for a transparent proxy or firewall blocking 443.	向公网 IP 发出的 HTTPS 连接异常失败。请检查是否有透明代理或防火墙拦截 443 端口。
+Owner inactive	所有者已停用
+Paper	纸白
+Paused: computer deleted	已暂停：计算机已删除
+Paused: computer disk full	已暂停：计算机磁盘已满
+Paused: computer over capacity	已暂停：计算机超出容量
+Paused: consecutive failures	已暂停：连续失败
+Paused: managed computers disabled	已暂停：托管计算机已禁用
+Paused: missed runs	已暂停：错过运行
+Paused: org deactivated	已暂停：组织已停用
+Paused: owner inactive	已暂停：所有者已停用
+Paused: workstream inactive	已暂停：工作流已停用
+Pick the trigger	选择触发条件
+Port holder identity (Windows introspection)	端口占用进程身份（Windows 进程检查）
+Possibly environmental (AV hook injection) or a Factory issue. If this persists, report a bug.	可能由环境问题（杀毒软件钩子注入）或 Factory 问题引起。若持续发生，请报告问题。
+Powered by Sentry	由 Sentry 提供支持
+Practice safe habits	养成安全习惯
+Process introspection (kernel handle filtering)	进程检查（内核句柄过滤）
+Process introspection is being filtered by the kernel (typical EDR / Windows 24H2 hardening). Factory now kills unverifiable holders aggressively, so this is not itself a failure -- but if other rows below show "Process introspection blocked", report that to IT.	内核正在过滤进程检查（常见于 EDR 或 Windows 24H2 安全加固）。Factory 会主动结束无法验证的端口占用进程，因此单独出现此项不表示故障。但若下方其他条目显示“进程检查被阻止”，请告知 IT。
+Prompt rejected by hook	提示词被钩子拒绝
+Provide credentials with a command	通过命令提供凭据
+Provider auth failed	提供商身份验证失败
+Provider error	提供商错误
+Provider rate limited	触发提供商速率限制
+Provider-specific request options. Nested JSON values are supported.	提供商专用的请求选项，支持嵌套 JSON 值。
+Pull request review	拉取请求审查
+Rank your findings	为发现的问题排序
+Rate limited by Factory	触发 Factory 速率限制
+Read a finding	阅读一个发现的问题
+Read a short script	阅读一个短脚本
+Read your scorecard	查看评分卡
+Reasoning effort	推理强度
+Recent crash history	最近崩溃记录
+Recommended actions for IT	建议 IT 执行的操作
+Region mismatch	区域不匹配
+Required to use the model. Leave blank only if this machine supplies a region.	使用模型时必填。仅当此计算机已提供区域配置时才可留空。
+Resolved locally from your AWS configuration. Leave blank for the default credential chain.	从本地 AWS 配置中解析。留空使用默认凭据链。
+Retry failed	重试失败
+Review view mode	审查视图模式
+Review your changes	审查你的更改
+Run a security review	执行安全审查
+Run a workstream	运行工作流
+Run interrupted	运行已中断
+Run it without a chat	以非交互方式运行
+Run never completed	运行未能完成
+Run thread create failed	创建运行讨论失败
+Runs locally if existing AWS credentials are not usable. The command must print AWS STS Credentials JSON. Only use a command you trust.	现有 AWS 凭据不可用时在本地运行。命令必须输出 AWS STS Credentials JSON。只使用你信任的命令。
+Runs locally only when the AWS credential chain lacks usable credentials, then retries the chain. Only use a command you trust.	仅在 AWS 凭据链没有可用凭据时在本地运行，然后重试凭据链。只使用你信任的命令。
+Runs on the computer using this model. Prints a token to stdout. Only use a command you trust.	在使用此模型的计算机上运行，并向标准输出打印令牌。只使用你信任的命令。
+SF template execution disabled	软件工厂模板执行已禁用
+Sandbox resume failed	恢复沙盒失败
+Second Item	第二项
+Select a credential source. Existing models without a selection keep their original precedence.	选择凭据来源。未作选择的现有模型会保持原有优先顺序。
+Select row	选择此行
+Send credential as	发送凭据的方式
+Service account computer not found	未找到服务账户计算机
+Service account entitlement unavailable	服务账户授权不可用
+Service account inactive	服务账户已停用
+Service account list computers failed	获取服务账户计算机列表失败
+Service account lookup failed	查找服务账户失败
+Service account no computers	服务账户没有计算机
+Service account not found	未找到服务账户
+Session closed by user	用户已关闭会话
+Session creation failed	创建会话失败
+Setup not finished	配置尚未完成
+Some Win32_Process fields are being filtered. Recovery is automatic but identity-based diagnostics are degraded.	部分 Win32_Process 字段被过滤。系统会自动恢复，但基于身份的诊断能力有所降低。
+Sorbet	果霜
+Start a Draft	开始起草
+Start your score	开始评分
+Studio	工作室
+TLS to api.factory.ai	连接 api.factory.ai 的 TLS
+Target deleted	目标已删除
+Target invalid	目标无效
+Target paused	目标已暂停
+Target session changed	目标会话已更改
+Target session moved	目标会话已移动
+Target session unavailable	目标会话不可用
+Template provision failed	模板配置失败
+Templates and labels help Droid find and scope work.	模板和标签帮助 Droid 发现工作并确定范围。
+Tests tell Droid whether its change works.	测试能告诉 Droid 更改是否有效。
+The daemon has crashed recently. See exit code analysis below for details.	守护进程最近发生过崩溃。详情请查看下方的退出码分析。
+The daemon process is not listening on its port. Try restarting Factory; if the problem persists, run Help → Report a Bug.	守护进程未监听其端口。请尝试重启 Factory；若问题仍存在，请运行“帮助 → 报告问题”。
+The model identifier sent to the provider's API.	发送到提供商 API 的模型标识。
+The organization score is calculated by taking the average level of all measured repositories in the organization.	组织得分是组织内所有已评估仓库等级的平均值。
+The x64 build is running under Windows ARM64 emulation. Install the native Windows ARM64 build.	x64 版正在通过 Windows ARM64 模拟运行。请安装原生 Windows ARM64 版。
+Thinking max tokens (optional)	思考 Token 上限（可选）
+This machine is joined to a Windows domain. If Factory keeps failing, the most likely cause is a corporate IT policy (firewall, EDR, AppLocker) interfering with the daemon. Forward this report to your IT team.	此计算机已加入 Windows 域。如果 Factory 持续失败，最可能的原因是企业 IT 策略（防火墙、EDR、AppLocker）干扰了守护进程。请将此报告转发给 IT 团队。
+Track it over time	持续跟踪
+Usage limit reached	已达用量上限
+Use an HTTPS endpoint or an environment reference such as ${BEDROCK_BASE_URL}.	使用 HTTPS 端点或 ${BEDROCK_BASE_URL} 等环境变量引用。
+Use default	使用默认值
+Use existing configuration	使用现有配置
+User not found	未找到用户
+WARN	警告
+What’s inside a wiki	知识库包含哪些内容
+Windows domain membership	Windows 域成员关系
+WorkOS auth (api.workos.com)	WorkOS 身份验证（api.workos.com）
+Workflow failed	工作流失败
+Workflow start failed	启动工作流失败
+Workspace not found	未找到工作区
+Workspaces disabled	工作区已禁用
+Workstream inactive	工作流已停用
+Write something …	写点内容…
+Zombie socket detection	僵尸套接字检测
+monthly usage	每月用量
+template gallery	模板库
+weekly usage	每周用量
+x-api-key (default)	x-api-key（默认）
+A JavaScript error occurred in the main process	主进程发生 JavaScript 错误
+Factory could not start	Factory 无法启动
+Could not load the Desktop configuration. Please contact support.	无法加载桌面客户端配置，请联系支持。
+Could not restart Desktop	无法重启桌面客户端
+Your deployment was saved. Reopen Desktop to continue.	部署配置已保存。请重新打开桌面客户端以继续。
+Something went wrong!	出现了问题！
+Hide Error	隐藏错误
+Show Error	显示错误
+Not Found	未找到
+Breadcrumb	导航路径
+Pagination	分页
+code	代码
+File Explorer	文件资源管理器
+e.g., https://mcp.example.com/sse	例如：https://mcp.example.com/sse
+e.g., https://mcp.example.com/mcp	例如：https://mcp.example.com/mcp
+Copied!	已复制！
+1 comment	1 条评论
+{{expression0}} comments	{{expression0}} 条评论
+Copied	已复制
+Copy	复制
+E2E Test Login	端到端测试登录
+Save & Login	保存并登录
+Rewinding…	正在回退…
+Rewind	回退
+ · expires {{expression0}}	 · 到期 {{expression0}}
+Archiving...	正在归档…
+Archive	归档
+matches	处匹配
+match	处匹配
+Disable	禁用
+Enable	启用
+Start your wiki	创建知识库

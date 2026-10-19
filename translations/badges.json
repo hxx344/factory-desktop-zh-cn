@@ -1,0 +1,466 @@
+{
+  "texts": [
+    {
+      "field": "name",
+      "source": "Super User",
+      "target": "超级用户"
+    },
+    {
+      "field": "description",
+      "source": "1000+ sessions",
+      "target": "至少 1000 个会话"
+    },
+    {
+      "field": "quip",
+      "source": "At this point, Droid should be paying rent in your terminal.",
+      "target": "到这份上，Droid 都该为长期住在你的终端里交房租了。"
+    },
+    {
+      "field": "name",
+      "source": "Power User",
+      "target": "资深用户"
+    },
+    {
+      "field": "description",
+      "source": "500+ sessions",
+      "target": "至少 500 个会话"
+    },
+    {
+      "field": "quip",
+      "source": "Your git log is basically a conversation history at this point.",
+      "target": "你的 Git 日志简直快成聊天记录了。"
+    },
+    {
+      "field": "name",
+      "source": "Getting Started",
+      "target": "初入门径"
+    },
+    {
+      "field": "description",
+      "source": "100+ sessions",
+      "target": "至少 100 个会话"
+    },
+    {
+      "field": "quip",
+      "source": "First 100 down, infinite context windows to go.",
+      "target": "前 100 个会话已完成，前方还有无穷无尽的上下文窗口。"
+    },
+    {
+      "field": "name",
+      "source": "Streak Legend",
+      "target": "连续使用传奇"
+    },
+    {
+      "field": "description",
+      "source": "30+ day streak",
+      "target": "连续使用至少 30 天"
+    },
+    {
+      "field": "quip",
+      "source": "A month straight. Even Duolingo owl is impressed.",
+      "target": "连续整整一个月，连 Duolingo 的猫头鹰都佩服你。"
+    },
+    {
+      "field": "name",
+      "source": "Streak Master",
+      "target": "连续使用大师"
+    },
+    {
+      "field": "description",
+      "source": "14+ day streak",
+      "target": "连续使用至少 14 天"
+    },
+    {
+      "field": "quip",
+      "source": "Two weeks of daily cooking. Your commit graph is thriving.",
+      "target": "连续两周天天开工，你的提交图一片繁茂。"
+    },
+    {
+      "field": "name",
+      "source": "Streak Starter",
+      "target": "连续使用新星"
+    },
+    {
+      "field": "description",
+      "source": "7+ day streak",
+      "target": "连续使用至少 7 天"
+    },
+    {
+      "field": "quip",
+      "source": "A full week. The habit is forming.",
+      "target": "整整一周，习惯正在养成。"
+    },
+    {
+      "field": "name",
+      "source": "Centurion",
+      "target": "百夫长"
+    },
+    {
+      "field": "description",
+      "source": "100+ hours total",
+      "target": "累计使用至少 100 小时"
+    },
+    {
+      "field": "quip",
+      "source": "That's 4+ days of pure Droid time. Touch grass?",
+      "target": "这相当于连续使用 Droid 四天多。要不要出去走走？"
+    },
+    {
+      "field": "name",
+      "source": "Droid Veteran",
+      "target": "Droid 老将"
+    },
+    {
+      "field": "description",
+      "source": "50+ hours total",
+      "target": "累计使用至少 50 小时"
+    },
+    {
+      "field": "quip",
+      "source": "Longer than most Netflix binges. At least you're shipping.",
+      "target": "比大多数 Netflix 追剧时间还长。至少你还在交付成果。"
+    },
+    {
+      "field": "name",
+      "source": "Droid Regular",
+      "target": "Droid 常客"
+    },
+    {
+      "field": "description",
+      "source": "25+ hours total",
+      "target": "累计使用至少 25 小时"
+    },
+    {
+      "field": "quip",
+      "source": "A full day with Droid. Time flies when you're shipping features.",
+      "target": "与 Droid 共度一整天。开发功能时，时间总是过得飞快。"
+    },
+    {
+      "field": "name",
+      "source": "Droid Familiar",
+      "target": "Droid 熟客"
+    },
+    {
+      "field": "description",
+      "source": "5+ hours total",
+      "target": "累计使用至少 5 小时"
+    },
+    {
+      "field": "quip",
+      "source": "More than most movies. Better plot too.",
+      "target": "比大多数电影还长，剧情也更精彩。"
+    },
+    {
+      "field": "name",
+      "source": "First Hour",
+      "target": "第一小时"
+    },
+    {
+      "field": "description",
+      "source": "1+ hour total",
+      "target": "累计使用至少 1 小时"
+    },
+    {
+      "field": "quip",
+      "source": "The first hour of many.",
+      "target": "这是无数个小时中的第一个。"
+    },
+    {
+      "field": "name",
+      "source": "Code is Life",
+      "target": "代码即生活"
+    },
+    {
+      "field": "description",
+      "source": "16+ hour session",
+      "target": "单次会话时长至少 16 小时"
+    },
+    {
+      "field": "quip",
+      "source": "Droid would like to speak with HR about work-life balance.",
+      "target": "Droid 想找人力资源部门聊聊工作与生活的平衡。"
+    },
+    {
+      "field": "name",
+      "source": "Ultra Marathon",
+      "target": "超级马拉松"
+    },
+    {
+      "field": "description",
+      "source": "8+ hour session",
+      "target": "单次会话时长至少 8 小时"
+    },
+    {
+      "field": "quip",
+      "source": "Longer than a typical Lex Fridman Podcast.",
+      "target": "比一集普通的 Lex Fridman Podcast 还长。"
+    },
+    {
+      "field": "name",
+      "source": "Marathon Coder",
+      "target": "马拉松程序员"
+    },
+    {
+      "field": "description",
+      "source": "4+ hour session",
+      "target": "单次会话时长至少 4 小时"
+    },
+    {
+      "field": "quip",
+      "source": "All that just for another useEffect?",
+      "target": "忙了这么久，就为了再加一个 useEffect？"
+    },
+    {
+      "field": "name",
+      "source": "Focused Session",
+      "target": "专注会话"
+    },
+    {
+      "field": "description",
+      "source": "2+ hour session",
+      "target": "单次会话时长至少 2 小时"
+    },
+    {
+      "field": "quip",
+      "source": "Could've watched Oppenheimer, chose to ship instead.",
+      "target": "本可以看《奥本海默》，却选择继续交付。"
+    },
+    {
+      "field": "name",
+      "source": "Hour Block",
+      "target": "一小时专注"
+    },
+    {
+      "field": "description",
+      "source": "1+ hour session",
+      "target": "单次会话时长至少 1 小时"
+    },
+    {
+      "field": "quip",
+      "source": "More productive than your last 3 standups.",
+      "target": "比你最近 3 次站会加起来还高效。"
+    },
+    {
+      "field": "name",
+      "source": "Night Owl",
+      "target": "夜猫子"
+    },
+    {
+      "field": "description",
+      "source": "35%+ sessions after 10pm",
+      "target": "至少 35% 的会话在晚上 10 点后"
+    },
+    {
+      "field": "quip",
+      "source": "The best code is written when everyone else is asleep.",
+      "target": "最好的代码，总在其他人都睡着时写成。"
+    },
+    {
+      "field": "name",
+      "source": "Early Bird",
+      "target": "早起鸟"
+    },
+    {
+      "field": "description",
+      "source": "35%+ sessions before 9am",
+      "target": "至少 35% 的会话在上午 9 点前"
+    },
+    {
+      "field": "quip",
+      "source": "Ship before standup, flex during standup.",
+      "target": "站会前交付，站会上秀成果。"
+    },
+    {
+      "field": "name",
+      "source": "Weekend Warrior",
+      "target": "周末战士"
+    },
+    {
+      "field": "description",
+      "source": "30%+ sessions on weekends",
+      "target": "至少 30% 的会话在周末"
+    },
+    {
+      "field": "quip",
+      "source": "Side projects or just really behind on work?",
+      "target": "在做业余项目，还是工作真的落下太多了？"
+    },
+    {
+      "field": "name",
+      "source": "The DJ",
+      "target": "DJ 达人"
+    },
+    {
+      "field": "description",
+      "source": "Sounds enabled",
+      "target": "已启用提示音"
+    },
+    {
+      "field": "quip",
+      "source": "Completion sounds hit different at 2am.",
+      "target": "凌晨两点的完成提示音，听起来格外带感。"
+    },
+    {
+      "field": "name",
+      "source": "Skill Collector",
+      "target": "技能收藏家"
+    },
+    {
+      "field": "description",
+      "source": "10+ skills installed",
+      "target": "已安装至少 10 个技能"
+    },
+    {
+      "field": "quip",
+      "source": "A skill for every occasion.",
+      "target": "总有一项技能派得上用场。"
+    },
+    {
+      "field": "name",
+      "source": "Droid Builder",
+      "target": "Droid 构建者"
+    },
+    {
+      "field": "description",
+      "source": "3+ custom droids",
+      "target": "至少 3 个自定义 Droid"
+    },
+    {
+      "field": "quip",
+      "source": "Why use defaults when you can customize everything?",
+      "target": "既然一切都能自定义，何必满足于默认？"
+    },
+    {
+      "field": "name",
+      "source": "Hook Master",
+      "target": "钩子大师"
+    },
+    {
+      "field": "description",
+      "source": "2+ hooks enabled",
+      "target": "已启用至少 2 个钩子"
+    },
+    {
+      "field": "quip",
+      "source": "Automated the automation.",
+      "target": "连自动化本身都自动化了。"
+    },
+    {
+      "field": "name",
+      "source": "BYOK Pioneer",
+      "target": "自有密钥（BYOK）开拓者"
+    },
+    {
+      "field": "description",
+      "source": "Custom models configured",
+      "target": "已配置自定义模型"
+    },
+    {
+      "field": "quip",
+      "source": "Bringing your own keys to the party.",
+      "target": "带上你自己的密钥来参加派对。"
+    },
+    {
+      "field": "name",
+      "source": "The Polyglot",
+      "target": "多语言高手"
+    },
+    {
+      "field": "description",
+      "source": "4+ languages used",
+      "target": "已使用至少 4 种语言"
+    },
+    {
+      "field": "quip",
+      "source": "Jack of all trades, master of... probably TypeScript.",
+      "target": "样样都会，最擅长的……大概是 TypeScript。"
+    },
+    {
+      "field": "name",
+      "source": "Rustacean",
+      "target": "Rust 爱好者"
+    },
+    {
+      "field": "description",
+      "source": "3+ Rust sessions",
+      "target": "至少 3 个 Rust 会话"
+    },
+    {
+      "field": "quip",
+      "source": "Memory safety is not a phase, mom.",
+      "target": "妈，内存安全可不是我一时兴起。"
+    },
+    {
+      "field": "name",
+      "source": "Gopher",
+      "target": "Go 爱好者"
+    },
+    {
+      "field": "description",
+      "source": "3+ Go sessions",
+      "target": "至少 3 个 Go 会话"
+    },
+    {
+      "field": "quip",
+      "source": "if err != nil { return err }",
+      "target": "if err != nil { return err }",
+      "preserveReason": "Go 语言代码片段，语法和标识符必须保持原样。"
+    },
+    {
+      "field": "name",
+      "source": "Model Explorer",
+      "target": "模型探索者"
+    },
+    {
+      "field": "description",
+      "source": "4+ models used",
+      "target": "已使用至少 4 个模型"
+    },
+    {
+      "field": "quip",
+      "source": "Testing all the models to find the one that agrees with you.",
+      "target": "把所有模型都试一遍，找出最赞同你的那个。"
+    },
+    {
+      "field": "name",
+      "source": "Early Adopter",
+      "target": "早期体验者"
+    },
+    {
+      "field": "description",
+      "source": "Joined before October 2025",
+      "target": "在 2025 年 10 月前加入"
+    },
+    {
+      "field": "quip",
+      "source": "You were here before it was cool.",
+      "target": "还没流行起来的时候，你就已经在这里了。"
+    }
+  ],
+  "renderTargets": [
+    {
+      "file": ".vite/renderer/main_window/assets/index-DJvfx-E_.js",
+      "start": 19413326,
+      "end": 19413332,
+      "raw": "t.name",
+      "field": "name",
+      "context": "rection:\"column\",gap:I.space[4],padding:I.space[20],children:[c.jsx(se,{variant:re.Caption,children:t.name}),c.jsx(se,{tone:De.Secondary,variant:re.Caption,children:t.description}),t.quip?c.jsx(Le,{padding:"
+    },
+    {
+      "file": ".vite/renderer/main_window/assets/index-DJvfx-E_.js",
+      "start": 19413391,
+      "end": 19413404,
+      "raw": "t.description",
+      "field": "description",
+      "context": "sx(se,{variant:re.Caption,children:t.name}),c.jsx(se,{tone:De.Secondary,variant:re.Caption,children:t.description}),t.quip?c.jsx(Le,{padding:`${I.space[4]} 0 0`,children:c.jsx(se,{tone:De.Tertiary,variant:re.Butto"
+    },
+    {
+      "file": ".vite/renderer/main_window/assets/index-DJvfx-E_.js",
+      "start": 19413520,
+      "end": 19413526,
+      "raw": "t.quip",
+      "field": "quip",
+      "context": "Le,{padding:`${I.space[4]} 0 0`,children:c.jsx(se,{tone:De.Tertiary,variant:re.ButtonLabel,children:t.quip})}):null]},t.name)}function JRu(t){const e=t.longestSession?.assistantActiveTimeMs??0,n=PRu(t.first"
+    }
+  ]
+}

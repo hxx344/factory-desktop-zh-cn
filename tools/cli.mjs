@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { resolveInstall, inspect, install, restore } from './install.mjs';
 import { sha256 } from './asar.mjs';
+import { adapterDigest } from './patch.mjs';
 
 try {
   const [command = 'status', ...args] = process.argv.slice(2);
@@ -9,7 +10,7 @@ try {
   const pack = JSON.parse(await readFile(new URL('../pack/zh-CN.json', import.meta.url)));
   const { digest, ...contents } = pack;
   if (sha256(Buffer.from(JSON.stringify(contents))) !== digest || pack.clientVersion !== profile.version) throw new Error('汉化包内容或适配版本校验失败');
-  if (pack.adapterSha256 !== sha256(await readFile(new URL('./patch.mjs', import.meta.url)))) throw new Error('语言加载适配器与汉化包版本不匹配');
+  if (pack.adapterSha256 !== await adapterDigest()) throw new Error('语言加载适配器与汉化包版本不匹配');
   let result;
   if (command === 'status') result = await inspect(root, profile);
   else if (command === 'install') result = await install(root, profile, pack);

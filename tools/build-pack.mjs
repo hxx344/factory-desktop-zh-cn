@@ -1,6 +1,9 @@
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { readAsar, sha256 } from './asar.mjs';
 import { extractCatalog, flatten, setPath, placeholders } from './catalog.mjs';
+import { readFullCatalog } from './full-catalog.mjs';
+import { textHash, validateTranslation, protectedTokens } from './quality.mjs';
+import { adapterDigest } from './patch.mjs';
 
 const profile = JSON.parse(await readFile(new URL('../profiles/0.201.0.json', import.meta.url)));
 const path = process.argv[2] ?? `${process.env.LOCALAPPDATA}/Factory/app-${profile.version}/resources/app.asar`;
@@ -20,31 +23,72 @@ for (const line of phraseText.split(/\r?\n/)) {
 }
 const overrides = JSON.parse(await readFile(new URL('../translations/overrides.json', import.meta.url)));
 const nativeOverrides = JSON.parse(await readFile(new URL('../translations/desktop.json', import.meta.url)));
+const contextual = JSON.parse(await readFile(new URL('../translations/context-overrides.json', import.meta.url)));
+const full = await readFullCatalog();
+if (full.missing.length || full.failures.length) {
+  await mkdir('.local', { recursive: true });
+  await writeFile('.local/full-validation.json', JSON.stringify({ missing: full.missing, failures: full.failures }, null, 2) + '\n');
+  throw new Error(`全量词典未通过：缺少 ${full.missing.length} 项，格式或保留说明错误 ${full.failures.length} 项，见 .local/full-validation.json`);
+}
 const resources = {};
 const desktop = {};
 const report = {};
 const untranslated = {};
-for (const [name, original, target, contextual] of [['renderer', english, resources, overrides], ['desktop', desktopEnglish, desktop, nativeOverrides]]) {
+for (const [name, original, target, localOverrides] of [['renderer', english, resources, { ...overrides, ...contextual }], ['desktop', desktopEnglish, desktop, nativeOverrides]]) {
   const flat = flatten(original);
-  for (const key of Object.keys(contextual)) if (!(key in flat)) throw new Error(`未知译文键：${name}:${key}`);
+  const keys = Object.keys(flat).sort(), required = Object.keys(full.inventory[name]).sort();
+  if (JSON.stringify(keys) !== JSON.stringify(required)) throw new Error(`原版词条集合与适配清单不一致：${name}`);
+  for (const key of Object.keys(localOverrides)) if (!(key in flat)) throw new Error(`未知译文键：${name}:${key}`);
   let translated = 0;
+  let preserved = 0;
   for (const [key, source] of Object.entries(flat)) {
-    const value = contextual[key] ?? memory.get(source);
-    if (value === undefined) { untranslated[`${name}.${key}`] = source; continue; }
-    if (JSON.stringify(placeholders(value)) !== JSON.stringify(placeholders(source))) throw new Error(`译文占位符不匹配：${key}`);
+    const id = full.inventory[name][key];
+    const reference = full.inventory.sources[id];
+    if (textHash(source) !== reference.sha256) throw new Error(`原版词条指纹不一致：${name}:${key}`);
+    const value = localOverrides[key] ?? full.translations[id];
+    const classification = validateTranslation(value, reference, `${name}:${key}`, full.preserved[id]);
     setPath(target, key, value);
-    translated++;
+    if (classification === 'preserved') preserved++;
+    else translated++;
   }
-  report[name] = { translated, total: Object.keys(flat).length };
+  report[name] = { translated, preserved, covered: translated + preserved, total: Object.keys(flat).length };
 }
+const version = JSON.parse(await readFile(new URL('../package.json', import.meta.url))).version;
+const hardcodedProfile = JSON.parse(await readFile(new URL('../profiles/0.201.0.hardcoded.json', import.meta.url)));
+const badges = JSON.parse(await readFile(new URL('../translations/badges.json', import.meta.url)));
+const hardcoded = { files: hardcodedProfile.files, entries: [], memoOwners: hardcodedProfile.memoOwners, languageSubscribers: hardcodedProfile.languageSubscribers, badgeIds: { name: {}, description: {}, quip: {} } };
+resources.hardcoded = {};
+desktop.desktop.hardcoded = {};
+for (const [index, entry] of badges.texts.entries()) {
+  if (!['name','description','quip'].includes(entry.field)) throw new Error('未知徽章字段');
+  validateTranslation(entry.target, { sha256: textHash(entry.source), ...protectedTokens(entry.source) }, `badge:${index}`, entry.preserveReason);
+  const key = `badge_${index}`;
+  hardcoded.badgeIds[entry.field][entry.source] = key;
+  resources.hardcoded[key] = entry.target;
+}
+for (const entry of hardcodedProfile.entries) {
+  if (entry.decision === 'preserved') {
+    if (!entry.reason?.trim()) throw new Error(`硬编码保留项缺少审核说明：${entry.file}:${entry.start}`);
+    continue;
+  }
+  if (entry.lookup === 'badge') { hardcoded.entries.push(entry); continue; }
+  if (entry.decision !== 'translated' || full.translations[entry.id] === undefined) throw new Error(`存在未处理硬编码：${entry.file}:${entry.start}`);
+  if (full.inventory.sources[entry.id].sha256 !== entry.sourceHash) throw new Error('硬编码源文指纹不匹配');
+  const text = full.translations[entry.id];
+  if (entry.runtime === 'renderer') resources.hardcoded[entry.id] = text;
+  else if (entry.runtime === 'main') desktop.desktop.hardcoded[entry.id] = text;
+  hardcoded.entries.push({ ...entry, ...(entry.runtime === 'early' ? { translation: text } : {}) });
+}
+report.hardcoded = { reviewed: hardcodedProfile.entries.length, localized: hardcoded.entries.length, preserved: hardcodedProfile.entries.length - hardcoded.entries.length, unresolved: 0, rendererResources: Object.keys(resources.hardcoded).length, desktopResources: Object.keys(desktop.desktop.hardcoded).length, badgeTexts: badges.texts.length };
 const pack = {
-  version: '0.1.0', clientVersion: profile.version, locale: 'zh-CN',
-  adapterSha256: sha256(await readFile(new URL('./patch.mjs', import.meta.url))),
+  version, clientVersion: profile.version, locale: 'zh-CN',
+  adapterSha256: await adapterDigest(),
+  hardcoded,
   resources, desktop,
   loader: ['正在启动 Factory', '启动时间比平时稍长…', '仍在等待。请检查网络连接，或重新加载后重试。', '重新加载'],
   coverage: report,
 };
-pack.inputsSha256 = sha256(Buffer.from(JSON.stringify({ profile, phrases: phraseText, overrides, desktop: nativeOverrides, adapterSha256: pack.adapterSha256 })));
+pack.inputsSha256 = sha256(Buffer.from(JSON.stringify({ profile, phrases: phraseText, overrides, contextOverrides: contextual, desktop: nativeOverrides, hardcodedProfile, badges, full: { inventory: full.inventory, translations: full.translations, preserved: full.preserved }, adapterSha256: pack.adapterSha256 })));
 pack.digest = sha256(Buffer.from(JSON.stringify(pack)));
 await mkdir('pack', { recursive: true });
 await writeFile('pack/zh-CN.json', `${JSON.stringify(pack, null, 2)}\n`);
