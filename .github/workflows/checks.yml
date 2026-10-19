@@ -1,0 +1,36 @@
+name: Windows checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - name: Validate PowerShell syntax
+        shell: powershell
+        run: |
+          foreach ($path in @('factory-zh.ps1', 'tools/package.ps1')) {
+            $tokens = $null
+            $parseErrors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD $path), [ref]$tokens, [ref]$parseErrors) | Out-Null
+            if ($parseErrors.Count) { throw ($parseErrors | Out-String) }
+          }
+      - name: Package offline translation files
+        shell: powershell
+        run: ./tools/package.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Factory-Desktop-zh-CN
+          path: dist/Factory-Desktop-zh-CN-*.zip*

@@ -1,0 +1,21 @@
+{
+  "version": "0.201.0",
+  "platform": "win32",
+  "arch": "x64",
+  "exeSha256": "41c4882cda0ffcb42c7b0aa8091ac5f9fb8b4dfa2f1fad70c6a14fe6f92435a6",
+  "asarSha256": "d6cad2750310d0e3a772c893f57736c1aa46036fc5902609a09441f5439e9d9d",
+  "files": {
+    "renderer": {
+      "path": ".vite/renderer/main_window/assets/index-DJvfx-E_.js",
+      "sha256": "918c347c34494344310136d14bde4861568af53668b70ea4fe1068d451dab905"
+    },
+    "main": {
+      "path": ".vite/build/initLifecycle-CRttfuow.js",
+      "sha256": "4ba6b602f766daaa9daafc92ca850cc5fee016d02ad8deb37543c34bd71580fe"
+    },
+    "html": {
+      "path": ".vite/renderer/main_window/index.html",
+      "sha256": "fd71dc96c07653103b48c7bf2e61ab0e9279b5b720293e5785d8b58dad9da9c0"
+    }
+  }
+}

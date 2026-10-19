@@ -1,0 +1,22 @@
+{
+  "name": "factory-desktop-zh-cn",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Factory Desktop 简体中文语言包",
+  "type": "module",
+  "scripts": {
+    "extract": "node tools/extract-i18n.mjs",
+    "build": "node tools/build-pack.mjs",
+    "check": "node tools/check.mjs",
+    "test": "node --test test/*.test.mjs",
+    "status": "node tools/cli.mjs status"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "acorn": "^8.15.0",
+    "i18next": "^25.8.13"
+  }
+}
