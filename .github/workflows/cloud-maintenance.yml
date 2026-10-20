@@ -1,0 +1,170 @@
+name: Cloud Factory maintenance
+on:
+  issues:
+    types: [opened]
+permissions:
+  contents: read
+concurrency:
+  group: factory-cloud-maintenance
+  cancel-in-progress: false
+jobs:
+  validate:
+    if: github.repository == 'hxx344/factory-desktop-zh-cn' && github.actor_id == '26082889' && github.event.issue.user.id == 26082889 && github.event.sender.id == 26082889 && startsWith(github.event.issue.title, 'Factory cloud request:')
+    runs-on: windows-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      mode: ${{ steps.prepare.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Preserve trusted bridge
+        shell: pwsh
+        run: Copy-Item tools/cloud-bridge.mjs (Join-Path $env:RUNNER_TEMP 'factory-cloud-bridge.mjs')
+      - name: Verify request and reconstruct candidate tree
+        id: prepare
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: node (Join-Path $env:RUNNER_TEMP 'factory-cloud-bridge.mjs') prepare --workspace $env:GITHUB_WORKSPACE --report (Join-Path $env:GITHUB_WORKSPACE 'output/cloud-request.json')
+      - name: Check whether exact baseline checks can be reused
+        id: reuse
+        if: steps.prepare.outputs.changed == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runs = await github.rest.actions.listWorkflowRuns({owner: context.repo.owner, repo: context.repo.repo, workflow_id: 'checks.yml', head_sha: context.sha, event: 'push', status: 'completed', per_page: 20});
+            const passed = runs.data.workflow_runs.find(run => run.head_sha === context.sha && run.conclusion === 'success');
+            core.setOutput('passed', passed ? 'true' : 'false');
+            if (passed) await core.summary.addRaw(`Reused Windows checks for this exact source commit: ${passed.html_url}\n`).write();
+      - run: npm ci
+      - name: Validate candidate source
+        if: steps.reuse.outputs.passed != 'true'
+        run: npm run check
+      - name: Run regression tests
+        if: steps.reuse.outputs.passed != 'true'
+        run: npm test
+      - name: Validate PowerShell sources
+        shell: pwsh
+        run: |
+          foreach ($taskPath in @('factory-zh.ps1','tools/package.ps1','tools/download-client.ps1','tools/cloud-ui.ps1')) {
+            $taskTokens = $null
+            $taskErrors = $null
+            [Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD $taskPath), [ref]$taskTokens, [ref]$taskErrors) | Out-Null
+            if ($taskErrors.Count) { throw ($taskErrors | Out-String) }
+          }
+      - name: Cache original official packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/factory-client-cache/*.nupkg
+          key: originals-${{ hashFiles('profiles/*.json') }}
+          restore-keys: originals-
+      - name: Verify native Windows clients and language switching
+        shell: pwsh
+        run: |
+          $taskVersions = node --input-type=module -e "import {supportedVersions} from './tools/versions.mjs'; console.log(JSON.stringify(supportedVersions))" | ConvertFrom-Json
+          foreach ($taskVersion in $taskVersions) {
+            $taskClient = & ./tools/download-client.ps1 -Version $taskVersion -Destination (Join-Path $env:RUNNER_TEMP 'factory-client-cache') | ConvertFrom-Json
+            node tools/cloud-native.mjs --root $taskClient.root --version $taskVersion --report (Join-Path $PWD ('output/native-' + $taskVersion + '.json'))
+            if ($LASTEXITCODE -ne 0) { throw ('Native acceptance failed: ' + $taskVersion) }
+            & ./tools/cloud-ui.ps1 -Root $taskClient.root -Version $taskVersion -Report (Join-Path $PWD ('output/ui-' + $taskVersion + '.json'))
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: factory-cloud-validation
+          path: |
+            output/cloud-request.json
+            output/native-*.json
+            output/ui-*.json
+            output/ui-*/login-zh-CN.png
+          if-no-files-found: warn
+  publish:
+    needs: validate
+    if: needs.validate.result == 'success' && needs.validate.outputs.mode == 'publish'
+    runs-on: windows-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Preserve trusted publishing code
+        shell: pwsh
+        run: |
+          Copy-Item tools/cloud-bridge.mjs (Join-Path $env:RUNNER_TEMP 'factory-cloud-bridge.mjs')
+          Copy-Item tools/package.ps1 (Join-Path $env:RUNNER_TEMP 'factory-cloud-package.ps1')
+          Copy-Item tools/package.mjs (Join-Path $env:RUNNER_TEMP 'package.mjs')
+      - name: Independently verify and reconstruct the validated tree
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: node (Join-Path $env:RUNNER_TEMP 'factory-cloud-bridge.mjs') prepare --workspace $env:GITHUB_WORKSPACE --report (Join-Path $env:RUNNER_TEMP 'publish-request.json')
+      - name: Package through trusted code
+        shell: pwsh
+        run: '& (Join-Path $env:RUNNER_TEMP ''factory-cloud-package.ps1'') -Root $env:GITHUB_WORKSPACE -OutputDirectory (Join-Path $env:RUNNER_TEMP ''factory-release'')'
+      - name: Commit, push and publish verified artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $taskRequest = Get-Content -LiteralPath (Join-Path $env:RUNNER_TEMP 'publish-request.json') -Raw | ConvertFrom-Json
+          $taskZip = Join-Path (Join-Path $env:RUNNER_TEMP 'factory-release') ('Factory-Desktop-zh-CN-v' + $taskRequest.packageVersion + '.zip')
+          node (Join-Path $env:RUNNER_TEMP 'factory-cloud-bridge.mjs') publish --workspace $env:GITHUB_WORKSPACE --zip $taskZip --checksum ($taskZip + '.sha256') --report (Join-Path $env:GITHUB_WORKSPACE 'output/cloud-publication.json')
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: factory-cloud-publication
+          path: output/cloud-publication.json
+          if-no-files-found: warn
+  report:
+    needs: [validate, publish]
+    if: always() && github.repository == 'hxx344/factory-desktop-zh-cn' && github.actor_id == '26082889' && github.event.issue.user.id == 26082889 && github.event.sender.id == 26082889 && startsWith(github.event.issue.title, 'Factory cloud request:')
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      actions: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: factory-cloud-*
+          path: output/cloud-results
+          merge-multiple: true
+      - name: Record the verified run outcome
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VALIDATION_RESULT: ${{ needs.validate.result }}
+          PUBLICATION_RESULT: ${{ needs.publish.result }}
+          REQUEST_MODE: ${{ needs.validate.outputs.mode }}
+        shell: pwsh
+        run: |
+          $taskStatus = if ($env:VALIDATION_RESULT -eq 'success' -and ($env:REQUEST_MODE -eq 'validate' -or $env:PUBLICATION_RESULT -eq 'success')) { 'passed' } else { 'failed' }
+          $taskArgs = @('tools/cloud-bridge.mjs','report','--status',$taskStatus,'--workspace',$env:GITHUB_WORKSPACE,'--report',(Join-Path $PWD 'output/cloud-outcome.json'))
+          if ($taskStatus -eq 'passed') {
+            $taskResultName = if ($env:REQUEST_MODE -eq 'publish') { 'cloud-publication.json' } else { 'cloud-request.json' }
+            $taskArgs += @('--result',(Join-Path (Join-Path $PWD 'output/cloud-results') $taskResultName))
+          }
+          & node @taskArgs

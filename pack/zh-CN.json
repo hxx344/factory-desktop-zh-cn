@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.3.1",
   "clientVersion": "0.202.0",
   "locale": "zh-CN",
   "adapterSha256": "518cff6667f674198ff90cb20252fff1fc3902293dcdf317d989bf51c2ebf642",
@@ -32926,5 +32926,5 @@
     }
   },
   "inputsSha256": "e9b293455463a8b1fa588cef3082021827a0dcf5063bd5a0af90ed9317565db3",
-  "digest": "2618019c643cf7e164fcf54e7ce9fbeb87f583af8a54c7de42145d0766d93d6c"
+  "digest": "7f03ecb75ab16ec5525396ffe761a9a4c9de85ce2fc66ebedf0bda0c8c05139a"
 }

@@ -58,4 +58,4 @@ for (const line of phrases.split(/\r?\n/)) {
   seen.add(source);
   assert.deepEqual(placeholders(source), placeholders(target), `占位符不匹配：${source}`);
 }
-for (const path of ['tools/asar.mjs', 'tools/patch.mjs', 'tools/install.mjs', 'tools/cli.mjs', 'tools/catalog.mjs', 'tools/build-pack.mjs', 'tools/check.mjs', 'tools/extract-i18n.mjs', 'tools/hardcoded.mjs', 'tools/quality.mjs', 'tools/full-catalog.mjs', 'tools/versions.mjs']) execFileSync(process.execPath, ['--check', path], { stdio: 'inherit' });
+for (const path of ['tools/asar.mjs', 'tools/patch.mjs', 'tools/install.mjs', 'tools/cli.mjs', 'tools/catalog.mjs', 'tools/build-pack.mjs', 'tools/check.mjs', 'tools/extract-i18n.mjs', 'tools/hardcoded.mjs', 'tools/quality.mjs', 'tools/full-catalog.mjs', 'tools/versions.mjs', 'tools/cloud-native.mjs', 'tools/cloud-bridge.mjs', 'tools/package.mjs']) execFileSync(process.execPath, ['--check', path], { stdio: 'inherit' });

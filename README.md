@@ -10,13 +10,13 @@
 
 ## 使用
 
-1. 从 Releases 下载 `Factory-Desktop-zh-CN-v0.3.0.zip` 并解压到普通文件夹。
+1. 从 Releases 下载 `Factory-Desktop-zh-CN-v0.3.1.zip` 并解压到普通文件夹。
 2. 正常退出 Factory，然后双击 `install.cmd`。
 3. 重新打开 Factory。中文系统会按系统语言选择简体中文；如果已有其他语言偏好，在 **Settings → General → Language** 中选择 **简体中文**。
 
 双击 `status.cmd` 查看状态；正常退出 Factory 后双击 `restore.cmd` 恢复原版。脚本不自动结束正在运行的会话。
 
-已安装 v0.1.0 或 v0.2.0 时，退出 Factory 后直接运行新版 `install.cmd` 即可升级，无需先恢复。相同客户端版本的原版备份继续保留。Factory 自动升级会替换应用资源，升级到本包支持的版本后重新运行 `install.cmd` 即可；不会把旧客户端备份写入新版本。
+已安装旧汉化包时，退出 Factory 后直接运行新版 `install.cmd` 即可升级，无需先恢复。相同客户端版本的原版备份继续保留。Factory 自动升级会替换应用资源，升级到本包支持的版本后重新运行 `install.cmd` 即可；不会把旧客户端备份写入新版本。
 
 已安装 Node.js 22 或更新版本时直接复用。否则脚本从 nodejs.org 下载固定版本的便携 Node.js，校验预置 SHA256 后缓存；无需全局安装，也不运行 npm install。运行语言包不需要翻译服务、API Key 或常驻调试端口。
 
@@ -58,5 +58,11 @@ powershell.exe -NoProfile -File tools/package.ps1
 已在 Windows 原生环境中验证安装、重复安装、更新、恢复、中途失败回滚、未知文件拒绝和英文回退；客户端副本验证了中文登录页、英文/中文切换及重启后的偏好保留，并检查全部修改脚本的可解析性。增加了富文本错误、代码/链接保护、延迟字段赋值和语言切换缓存的回归检查，并复核高风险权限与计费文案。隔离验收未登录真实账户，因此未对全部登录后业务页面做交互验收。GitHub Actions 运行 Windows 检查与打包，不使用 WSL。
 
 分发包只包含本项目脚本、译文和版本清单，不包含 Factory EXE、ASAR、用户配置、凭据或会话。
+
+## 云端维护
+
+云端每日任务负责检查官方版本和完成汉化适配，Windows GitHub Actions 负责原生验收与发布。整个流程从仓库和官方安装包取得资源，不依赖开发电脑或本机 Factory。无更新时跳过重复构建和发布。
+
+云端连接器通过 Git blob/tree 和仓库控制 Issue 提交候选内容；受限工作流独立验证请求、候选树和产物，再按原作者身份提交并发布。只有固定账号的结构化请求可进入执行流程，候选代码不能修改发布桥和工作流，也不会接触发布用的写入令牌。见 [云端维护说明](docs/cloud-maintenance.md)。
 
 技术依据：[Electron ASAR 完整性验证](https://www.electronjs.org/docs/latest/tutorial/asar-integrity)、[i18next 资源配置](https://www.i18next.com/overview/configuration-options)。

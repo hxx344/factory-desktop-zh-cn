@@ -21,7 +21,7 @@ jobs:
       - name: Validate PowerShell syntax
         shell: powershell
         run: |
-          foreach ($path in @('factory-zh.ps1', 'tools/package.ps1')) {
+          foreach ($path in @('factory-zh.ps1', 'tools/package.ps1', 'tools/download-client.ps1', 'tools/cloud-ui.ps1')) {
             $tokens = $null
             $parseErrors = $null
             [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD $path), [ref]$tokens, [ref]$parseErrors) | Out-Null
