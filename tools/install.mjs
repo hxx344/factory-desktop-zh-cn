@@ -54,8 +54,8 @@ export async function inspect(root, profile) {
   const receipt = await exists(receiptPath) ? await json(receiptPath) : null;
   let state = 'unknown';
   if (current.exe === profile.exeSha256 && current.asar === profile.asarSha256) state = 'original';
-  else if (receipt && current.exe === receipt.patched.exe && current.asar === receipt.patched.asar) state = 'installed';
-  else if (receipt && Object.keys(names).every(kind => [receipt.original[kind], receipt.patched[kind], receipt.previous?.[kind]].includes(current[kind]))) state = 'interrupted';
+  else if (receipt?.clientVersion === profile.version && current.exe === receipt.patched.exe && current.asar === receipt.patched.asar) state = 'installed';
+  else if (receipt?.clientVersion === profile.version && Object.keys(names).every(kind => [receipt.original[kind], receipt.patched[kind], receipt.previous?.[kind]].includes(current[kind]))) state = 'interrupted';
   return { state, current, receipt };
 }
 

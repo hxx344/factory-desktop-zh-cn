@@ -8,20 +8,25 @@ import { patchClient } from '../tools/patch.mjs';
 import { install, inspect, restore } from '../tools/install.mjs';
 import { extractCatalog, placeholders } from '../tools/catalog.mjs';
 import i18next from 'i18next';
+import { runInNewContext } from 'node:vm';
+import { packPath, loadTarget, supportedVersions } from '../tools/versions.mjs';
 
-function fixture() {
+const adapters = Object.fromEntries(await Promise.all(supportedVersions.map(async version => [version, JSON.parse(await readFile(new URL(`../profiles/${version}.json`, import.meta.url))).adapter])));
+
+function fixture(version = '0.201.0') {
+  const adapter = adapters[version], r = adapter.renderer, m = adapter.main;
   const empty = { header: { files: {} }, bytes: Buffer.alloc(0), base: 0 };
   const files = {
-    'package.json': '{"version":"0.201.0"}',
-    '.vite/renderer/main_window/assets/index.js': 'const iZe=[Ju.English,Ju.Japanese,Ju.Korean];const YSu={[Ju.Japanese]:()=>1};eon();y9o.createRoot(document.getElementById("root")).render(c.jsx(Pfc,{env:u7t,children:c.jsx(Jju,{})}));',
-    '.vite/build/main.js': 'const v3=[Se.English,Se.Japanese,Se.Korean];const rC={[Se.English]:nC,[Se.Japanese]:{desktop:{}}};',
-    '.vite/renderer/main_window/index.html': '<script>var messages = {en:[]};var locale = \'en\';</script>',
+    'package.json': JSON.stringify({ version }),
+    '.vite/renderer/main_window/assets/index.js': `const ${r.supported}=[${r.enum}.English,${r.enum}.Japanese,${r.enum}.Korean];const ${r.imports}={[${r.enum}.Japanese]:()=>1};${r.i18n}();${r.mount}`,
+    '.vite/build/main.js': `const ${m.supported}=[${m.enum}.English,${m.enum}.Japanese,${m.enum}.Korean];const ${m.resources}={[${m.enum}.English]:${m.englishRoot},[${m.enum}.Japanese]:{desktop:{}}};`,
+    '.vite/renderer/main_window/index.html': `<script>var messages = {en:[]};var locale = 'en';${version === '0.202.0' ? 'globalThis.tips=messages[locale][4];globalThis.specMode=tips.specMode;' : ''}</script>`,
     'unrelated.bin': 'UNTOUCHED',
   };
   const asar = writeAsar(empty, new Map(Object.entries(files).map(([key, value]) => [key, Buffer.from(value)])));
   const hash = sha256(parseAsar(asar).rawHeader);
   const exe = Buffer.from(`MZ-fuse-010011011-resource:[{"file":"resources\\\\app.asar","alg":"SHA256","value":"${hash}"}]-signed-data`);
-  const profile = { version: '0.201.0', asarSha256: sha256(asar), exeSha256: sha256(exe), files: {} };
+  const profile = { version, asarSha256: sha256(asar), exeSha256: sha256(exe), files: {}, adapter };
   for (const [kind, path] of Object.entries({ renderer: '.vite/renderer/main_window/assets/index.js', main: '.vite/build/main.js', html: '.vite/renderer/main_window/index.html' })) profile.files[kind] = { path, sha256: sha256(Buffer.from(files[path])) };
   const pack = { version: '0.1.0', digest: 'test-pack-v1', resources: { common: { save: '保存', items_one: '{{count}} 项', items_other: '{{count}} 项' } }, desktop: { desktop: { menu: { settings: '设置' } } }, loader: ['正在启动', '稍候', '请重试', '重新加载'] };
   return { asar, exe, profile, pack };
@@ -37,8 +42,8 @@ async function directory(t, fixture) {
   return root;
 }
 
-test('native resource registration preserves other ASAR entries and every EXE byte except the header hash', () => {
-  const f = fixture();
+for (const version of supportedVersions) test(`${version} native resource registration preserves other ASAR entries and every EXE byte except the header hash`, () => {
+  const f = fixture(version);
   const result = patchClient(f.asar, f.exe, f.profile, f.pack);
   const archive = parseAsar(result.asar);
   assert.equal(archive.read('unrelated.bin').toString(), 'UNTOUCHED');
@@ -131,13 +136,50 @@ test('catalog extraction never executes bundled code and validates markup placeh
 });
 
 test('the shipped pack has a valid digest and publishes its actual coverage', async () => {
-  const pack = JSON.parse(await readFile(new URL('../pack/zh-CN.json', import.meta.url)));
-  const { digest, ...contents } = pack;
-  assert.equal(digest, sha256(Buffer.from(JSON.stringify(contents))));
-  assert.equal(pack.locale, 'zh-CN');
-  assert.equal(pack.desktop.desktop.quitGuard.title, '退出 Factory？');
-  assert.equal(pack.coverage.renderer.covered, pack.coverage.renderer.total);
-  assert.equal(pack.coverage.desktop.covered, pack.coverage.desktop.total);
-  assert.equal(pack.coverage.renderer.translated + pack.coverage.renderer.preserved, pack.coverage.renderer.total);
-  assert.equal(pack.coverage.hardcoded.unresolved, 0);
+  for (const version of supportedVersions) {
+    const pack = JSON.parse(await readFile(new URL(`../${packPath(version)}`, import.meta.url)));
+    const { digest, ...contents } = pack;
+    assert.equal(digest, sha256(Buffer.from(JSON.stringify(contents))));
+    assert.equal(pack.locale, 'zh-CN');
+    assert.equal(pack.desktop.desktop.quitGuard.title, '退出 Factory？');
+    assert.equal(pack.coverage.renderer.covered, pack.coverage.renderer.total);
+    assert.equal(pack.coverage.desktop.covered, pack.coverage.desktop.total);
+    assert.equal(pack.coverage.renderer.translated + pack.coverage.renderer.preserved, pack.coverage.renderer.total);
+    assert.equal(pack.coverage.hardcoded.unresolved, 0);
+  }
+});
+
+test('target selection follows the actual archive version and refuses an unsupported upgrade', async t => {
+  const f = fixture(), root = await directory(t, f);
+  assert.equal((await loadTarget(root)).profile.version, '0.201.0');
+  const archive = parseAsar(f.asar);
+  await writeFile(join(root, 'resources/app.asar'), writeAsar(archive, new Map([['package.json', Buffer.from('{"version":"0.202.0"}')]])));
+  assert.equal((await loadTarget(root)).profile.version, '0.202.0');
+  await writeFile(join(root, 'resources/app.asar'), writeAsar(archive, new Map([['package.json', Buffer.from('{"version":"0.203.0"}')]])));
+  await assert.rejects(loadTarget(root), /暂未适配/);
+  assert.throws(() => packPath('../other'), /暂未适配/);
+});
+
+test('a receipt from another client version cannot authorize installation or restore', async t => {
+  const f = fixture(), root = await directory(t, f), options = { checkStopped() {} };
+  await install(root, f.profile, f.pack, options);
+  const path = join(root, '.factory-zh-cn/receipt.json');
+  const receipt = JSON.parse(await readFile(path));
+  await writeFile(path, JSON.stringify({ ...receipt, clientVersion: '0.200.0' }));
+  assert.equal((await inspect(root, f.profile)).state, 'unknown');
+  await assert.rejects(restore(root, f.profile, options), /已升级或被修改/);
+  await assert.rejects(install(root, f.profile, f.pack, options), /未知客户端/);
+  assert.throws(() => patchClient(f.asar, f.exe, f.profile, { ...f.pack, clientVersion: '0.202.0' }), /版本不匹配/);
+});
+
+test('the 0.202 startup loader supplies every new shortcut tip before the app mounts', async () => {
+  const f = fixture('0.202.0');
+  const shipped = JSON.parse(await readFile(new URL('../pack/zh-CN.json', import.meta.url)));
+  const result = patchClient(f.asar, f.exe, f.profile, { ...f.pack, loader: shipped.loader });
+  const html = parseAsar(result.asar).read(f.profile.files.html.path).toString();
+  const context = { navigator: { languages: ['zh-Hans-CN'] } };
+  runInNewContext(html.match(/<script>([\s\S]*)<\/script>/)[1], context);
+  assert.equal(context.specMode, '切换方案模式：');
+  assert.deepEqual(Object.keys(context.tips).sort(), ['autonomy', 'commandPalette', 'model', 'reasoning', 'specMode', 'stop']);
+  for (const value of Object.values(context.tips)) assert.match(value, /\p{Script=Han}/u);
 });

@@ -4,14 +4,17 @@ import { extractCatalog, flatten, setPath, placeholders } from './catalog.mjs';
 import { readFullCatalog } from './full-catalog.mjs';
 import { textHash, validateTranslation, protectedTokens } from './quality.mjs';
 import { adapterDigest } from './patch.mjs';
+import { readProfile, latestVersion, packPath } from './versions.mjs';
+import { dirname } from 'node:path';
+import { parseExpressionAt } from 'acorn';
 
-const profile = JSON.parse(await readFile(new URL('../profiles/0.201.0.json', import.meta.url)));
+const profile = await readProfile(process.argv[3] ?? latestVersion);
 const path = process.argv[2] ?? `${process.env.LOCALAPPDATA}/Factory/app-${profile.version}/resources/app.asar`;
 const asar = await readAsar(path);
-if (sha256(asar.bytes) !== profile.asarSha256) throw new Error('需要原版 0.201.0 资源，不能从已修改的客户端生成语言包');
-const raw = extractCatalog(asar.read(profile.files.renderer.path).toString('utf8'), 'B8t', true);
+if (sha256(asar.bytes) !== profile.asarSha256) throw new Error(`需要原版 ${profile.version} 资源，不能从已修改的客户端生成语言包`);
+const raw = extractCatalog(asar.read(profile.files.renderer.path).toString('utf8'), profile.adapter.renderer.englishRoot, true);
 const english = Object.fromEntries(Object.entries(raw).map(([key, value]) => [key.replace(/^.*\//, '').replace(/\.json$/, ''), value]));
-const desktopEnglish = extractCatalog(asar.read(profile.files.main.path).toString('utf8'), 'nC');
+const desktopEnglish = extractCatalog(asar.read(profile.files.main.path).toString('utf8'), profile.adapter.main.englishRoot);
 const memory = new Map();
 const phraseText = await readFile(new URL('../translations/phrases.tsv', import.meta.url), 'utf8');
 for (const line of phraseText.split(/\r?\n/)) {
@@ -24,7 +27,17 @@ for (const line of phraseText.split(/\r?\n/)) {
 const overrides = JSON.parse(await readFile(new URL('../translations/overrides.json', import.meta.url)));
 const nativeOverrides = JSON.parse(await readFile(new URL('../translations/desktop.json', import.meta.url)));
 const contextual = JSON.parse(await readFile(new URL('../translations/context-overrides.json', import.meta.url)));
-const full = await readFullCatalog();
+const loader = JSON.parse(await readFile(new URL('../translations/loader.json', import.meta.url)));
+const html = asar.read(profile.files.html.path).toString('utf8');
+const marker = 'var messages = ';
+if (html.split(marker).length !== 2) throw new Error('未知启动页词典结构');
+const loaderNode = parseExpressionAt(html, html.indexOf(marker) + marker.length, { ecmaVersion: 'latest' });
+const loaderEnglish = extractCatalog(`const messages=${html.slice(loaderNode.start, loaderNode.end)};`, 'messages').en;
+const loaderResources = loader.slice(0, loaderEnglish.length);
+const loaderFlat = flatten(loaderResources), loaderEnglishFlat = flatten(loaderEnglish);
+if (JSON.stringify(Object.keys(loaderFlat).sort()) !== JSON.stringify(Object.keys(loaderEnglishFlat).sort())) throw new Error('启动页词典键集合不一致');
+for (const [key, source] of Object.entries(loaderEnglishFlat)) validateTranslation(loaderFlat[key], { sha256: textHash(source), ...protectedTokens(source) }, `loader:${key}`);
+const full = await readFullCatalog(profile.version);
 if (full.missing.length || full.failures.length) {
   await mkdir('.local', { recursive: true });
   await writeFile('.local/full-validation.json', JSON.stringify({ missing: full.missing, failures: full.failures }, null, 2) + '\n');
@@ -38,7 +51,7 @@ for (const [name, original, target, localOverrides] of [['renderer', english, re
   const flat = flatten(original);
   const keys = Object.keys(flat).sort(), required = Object.keys(full.inventory[name]).sort();
   if (JSON.stringify(keys) !== JSON.stringify(required)) throw new Error(`原版词条集合与适配清单不一致：${name}`);
-  for (const key of Object.keys(localOverrides)) if (!(key in flat)) throw new Error(`未知译文键：${name}:${key}`);
+  // Shared overrides may target a key removed from another supported client version.
   let translated = 0;
   let preserved = 0;
   for (const [key, source] of Object.entries(flat)) {
@@ -54,9 +67,9 @@ for (const [name, original, target, localOverrides] of [['renderer', english, re
   report[name] = { translated, preserved, covered: translated + preserved, total: Object.keys(flat).length };
 }
 const version = JSON.parse(await readFile(new URL('../package.json', import.meta.url))).version;
-const hardcodedProfile = JSON.parse(await readFile(new URL('../profiles/0.201.0.hardcoded.json', import.meta.url)));
+const hardcodedProfile = JSON.parse(await readFile(new URL(`../profiles/${profile.version}.hardcoded.json`, import.meta.url)));
 const badges = JSON.parse(await readFile(new URL('../translations/badges.json', import.meta.url)));
-const hardcoded = { files: hardcodedProfile.files, entries: [], memoOwners: hardcodedProfile.memoOwners, languageSubscribers: hardcodedProfile.languageSubscribers, badgeIds: { name: {}, description: {}, quip: {} } };
+const hardcoded = { files: hardcodedProfile.files, entries: [], useTranslation: profile.adapter.renderer.useTranslation, memoOwners: hardcodedProfile.memoOwners, languageSubscribers: hardcodedProfile.languageSubscribers, badgeIds: { name: {}, description: {}, quip: {} } };
 resources.hardcoded = {};
 desktop.desktop.hardcoded = {};
 for (const [index, entry] of badges.texts.entries()) {
@@ -85,14 +98,15 @@ const pack = {
   adapterSha256: await adapterDigest(),
   hardcoded,
   resources, desktop,
-  loader: ['正在启动 Factory', '启动时间比平时稍长…', '仍在等待。请检查网络连接，或重新加载后重试。', '重新加载'],
+  loader: loaderResources,
   coverage: report,
 };
-pack.inputsSha256 = sha256(Buffer.from(JSON.stringify({ profile, phrases: phraseText, overrides, contextOverrides: contextual, desktop: nativeOverrides, hardcodedProfile, badges, full: { inventory: full.inventory, translations: full.translations, preserved: full.preserved }, adapterSha256: pack.adapterSha256 })));
+pack.inputsSha256 = sha256(Buffer.from(JSON.stringify({ profile, phrases: phraseText, overrides, contextOverrides: contextual, desktop: nativeOverrides, loader, hardcodedProfile, badges, full: { inventory: full.inventory, translations: full.translations, preserved: full.preserved }, adapterSha256: pack.adapterSha256 })));
 pack.digest = sha256(Buffer.from(JSON.stringify(pack)));
-await mkdir('pack', { recursive: true });
-await writeFile('pack/zh-CN.json', `${JSON.stringify(pack, null, 2)}\n`);
+const destination = packPath(profile.version);
+await mkdir(dirname(destination), { recursive: true });
+await writeFile(destination, `${JSON.stringify(pack, null, 2)}\n`);
 await mkdir('.local', { recursive: true });
 await writeFile('.local/untranslated.json', `${JSON.stringify(untranslated, null, 2)}\n`);
-await writeFile('.local/desktop-en.json', `${JSON.stringify(desktopEnglish, null, 2)}\n`);
+await writeFile(`.local/${profile.version}-desktop-en.json`, `${JSON.stringify(desktopEnglish, null, 2)}\n`);
 console.log(JSON.stringify({ version: pack.version, clientVersion: pack.clientVersion, coverage: report, digest: pack.digest }, null, 2));

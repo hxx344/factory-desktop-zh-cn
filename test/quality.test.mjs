@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { runInNewContext } from 'node:vm';
 import { textHash, protectedTokens, validateTranslation } from '../tools/quality.mjs';
-import { applyHardcoded, rendererHelper, badgeHelper } from '../tools/hardcoded.mjs';
+import { applyHardcoded, rendererHelper, badgeHelper, localizedHelper } from '../tools/hardcoded.mjs';
 
 const reference = source => ({ sha256: textHash(source), ...protectedTokens(source) });
 
@@ -49,11 +49,12 @@ test('an unexpected source location or overlapping patch is refused', () => {
   assert.throws(() => applyHardcoded(source, 'renderer', { files: { renderer: textHash(source) }, entries: [{ file: 'renderer', start: 0, end: 2, raw: 'WRONG', runtime: 'renderer', id: '0' }] }), /位置不匹配/);
 });
 
-test('a localized component invalidates only its compiled memo when the translation function changes', () => {
+for (const [hook, getter] of [['le', 'eon'], ['ce', 'yrn']]) test(`${hook}: a localized component invalidates only its compiled memo when the translation function changes`, () => {
   const source = 'function Component(props){const memo=z.c(2);let value;if(memo[0]!==props){value="Breadcrumb";memo[0]=props;memo[1]=value}else value=memo[1];return value}globalThis.Component=Component;';
   const start = source.indexOf('"Breadcrumb"');
   const sizeStart = source.indexOf('2');
   const manifest = {
+    useTranslation: hook,
     files: { renderer: textHash(source) },
     entries: [{ file: 'renderer', runtime: 'renderer', id: '0', start, end: start + 12, raw: '"Breadcrumb"' }],
     memoOwners: [{ file: 'renderer', bodyStart: source.indexOf('{') + 1, declarationEnd: source.indexOf(';') + 1, cacheName: 'memo', size: 2, sizeStart, sizeEnd: sizeStart + 1 }],
@@ -61,8 +62,8 @@ test('a localized component invalidates only its compiled memo when the translat
   let language = 'en', translation = () => 'Breadcrumb';
   const state = { userInput: 'do not lose this input' };
   const cache = Array(3).fill(Symbol.for('react.memo_cache_sentinel'));
-  const context = { le: () => ({ t: translation }), z: { c: () => cache }, eon: () => ({ t: () => language === 'en' ? 'Breadcrumb' : '导航路径' }), state };
-  runInNewContext(`${rendererHelper}${applyHardcoded(source, 'renderer', manifest)}`, context);
+  const context = { [hook]: () => ({ t: translation }), z: { c: () => cache }, [getter]: () => ({ t: () => language === 'en' ? 'Breadcrumb' : '导航路径' }), state };
+  runInNewContext(`${localizedHelper(rendererHelper, 'eon', getter)}${applyHardcoded(source, 'renderer', manifest)}`, context);
   const props = {};
   assert.equal(context.Component(props), 'Breadcrumb');
   language = 'zh-CN'; translation = () => '导航路径';

@@ -26,6 +26,8 @@ export function hardcodedExpression(entry) {
 export function applyHardcoded(source, file, manifest) {
   const entries = manifest?.entries.filter(entry => entry.file === file) ?? [];
   if (!entries.length) return source;
+  const hook = manifest.useTranslation ?? 'le';
+  if (!/^[A-Za-z_$][\w$]*$/.test(hook)) throw new Error('本地化订阅函数不匹配');
   if (sha256(Buffer.from(source)) !== manifest.files[file]) throw new Error(`硬编码资源指纹不匹配：${file}`);
   const changes = entries.map(entry => {
     if (source.slice(entry.start, entry.end) !== entry.raw) throw new Error(`硬编码位置不匹配：${file}:${entry.start}`);
@@ -40,14 +42,14 @@ export function applyHardcoded(source, file, manifest) {
   for (const owner of manifest?.memoOwners?.filter(owner => owner.file === file) ?? []) {
     if (source.slice(owner.sizeStart, owner.sizeEnd) !== String(owner.size) || !/^[A-Za-z_$][\w$]*$/.test(owner.cacheName) || !Number.isSafeInteger(owner.size)) throw new Error('本地化组件缓存结构不匹配');
     changes.push(
-      { start: owner.bodyStart, end: owner.bodyStart, text: 'const __factoryZhLanguageT=le("hardcoded").t;' },
+      { start: owner.bodyStart, end: owner.bodyStart, text: `const __factoryZhLanguageT=${hook}("hardcoded").t;` },
       { start: owner.sizeStart, end: owner.sizeEnd, text: String(owner.size + 1) },
       { start: owner.declarationEnd, end: owner.declarationEnd, text: `if(${owner.cacheName}[${owner.size}]!==__factoryZhLanguageT){${owner.cacheName}.fill(Symbol.for("react.memo_cache_sentinel"));${owner.cacheName}[${owner.size}]=__factoryZhLanguageT;}` },
     );
   }
   for (const component of manifest?.languageSubscribers?.filter(component => component.file === file) ?? []) {
     if (source[component.bodyStart - 1] !== '{') throw new Error('本地化组件入口不匹配');
-    changes.push({ start: component.bodyStart, end: component.bodyStart, text: 'le("hardcoded");' });
+    changes.push({ start: component.bodyStart, end: component.bodyStart, text: `${hook}("hardcoded");` });
   }
   changes.sort((a, b) => b.start - a.start);
   let previous = source.length;
@@ -61,6 +63,11 @@ export function applyHardcoded(source, file, manifest) {
 
 export const rendererHelper = 'function __factoryZhUi(id,fallback,values={}){try{return eon().t("hardcoded:"+id,{defaultValue:fallback,...values})}catch{return fallback}}';
 export const mainHelper = 'function __factoryZhNative(id,fallback,values={}){try{return ne("hardcoded."+id,{defaultValue:fallback,...values})}catch{return fallback}}';
+
+export function localizedHelper(source, original, binding) {
+  if (!/^[A-Za-z_$][\w$]*$/.test(binding)) throw new Error('本地化翻译函数不匹配');
+  return source.replace(`${original}(`, `${binding}(`);
+}
 
 export function badgeHelper(mapping) {
   return `var __factoryZhBadgeIds=${JSON.stringify(mapping ?? {})};function __factoryZhBadge(field,value){if(typeof value!=="string")return value;const id=__factoryZhBadgeIds[field]?.[value];return typeof id==="string"?__factoryZhUi(id,value):value}`;

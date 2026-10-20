@@ -1,10 +1,12 @@
 import { readFile } from 'node:fs/promises';
 import { validateTranslation } from './quality.mjs';
+import { latestVersion, readProfile } from './versions.mjs';
 
-export async function readFullCatalog() {
-  const inventory = JSON.parse(await readFile(new URL('../profiles/0.201.0.catalog.json', import.meta.url)));
+export async function readFullCatalog(version = latestVersion) {
+  await readProfile(version);
+  const inventory = JSON.parse(await readFile(new URL(`../profiles/${version}.catalog.json`, import.meta.url)));
   const translations = {}, preserved = {};
-  for (const name of ['seed', 'worker-1', 'worker-2', 'worker-3', 'hardcoded']) {
+  for (const name of ['seed', 'worker-1', 'worker-2', 'worker-3', 'hardcoded', 'update-0.202.0']) {
     const path = new URL(`../translations/full/${name}.json`, import.meta.url);
     let values;
     try { values = JSON.parse(await readFile(path)); }
@@ -14,7 +16,7 @@ export async function readFullCatalog() {
       if (translations[id] !== undefined) throw new Error(`重复全量词条 ID：${id}`);
       translations[id] = text;
     }
-    const preserveName = name === 'seed' ? 'preserve-seed' : name === 'hardcoded' ? 'preserve-hardcoded' : name.replace('worker', 'preserve');
+    const preserveName = name.startsWith('worker-') ? name.replace('worker', 'preserve') : `preserve-${name}`;
     try { Object.assign(preserved, JSON.parse(await readFile(new URL(`../translations/full/${preserveName}.json`, import.meta.url)))); }
     catch (error) { if (error.code !== 'ENOENT') throw error; }
   }

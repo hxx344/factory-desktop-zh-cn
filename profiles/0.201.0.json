@@ -4,6 +4,15 @@
   "arch": "x64",
   "exeSha256": "41c4882cda0ffcb42c7b0aa8091ac5f9fb8b4dfa2f1fad70c6a14fe6f92435a6",
   "asarSha256": "d6cad2750310d0e3a772c893f57736c1aa46036fc5902609a09441f5439e9d9d",
+  "adapter": {
+    "renderer": {
+      "enum": "Ju", "supported": "iZe", "imports": "YSu", "preload": "Pt",
+      "i18n": "eon", "useTranslation": "le", "resolve": "upc", "switch": "XSu",
+      "persist": "tMu", "logger": "Je", "englishRoot": "B8t",
+      "mount": "y9o.createRoot(document.getElementById(\"root\")).render(c.jsx(Pfc,{env:u7t,children:c.jsx(Jju,{})}));"
+    },
+    "main": { "enum": "Se", "supported": "v3", "resources": "rC", "englishRoot": "nC", "i18n": "ne" }
+  },
   "files": {
     "renderer": {
       "path": ".vite/renderer/main_window/assets/index-DJvfx-E_.js",
