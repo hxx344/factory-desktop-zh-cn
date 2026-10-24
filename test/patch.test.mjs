@@ -20,7 +20,7 @@ function fixture(version = '0.201.0') {
     'package.json': JSON.stringify({ version }),
     '.vite/renderer/main_window/assets/index.js': `const ${r.supported}=[${r.enum}.English,${r.enum}.Japanese,${r.enum}.Korean];const ${r.imports}={[${r.enum}.Japanese]:()=>1};${r.i18n}();${r.mount}`,
     '.vite/build/main.js': `const ${m.supported}=[${m.enum}.English,${m.enum}.Japanese,${m.enum}.Korean];const ${m.resources}={[${m.enum}.English]:${m.englishRoot},[${m.enum}.Japanese]:{desktop:{}}};`,
-    '.vite/renderer/main_window/index.html': `<script>var messages = {en:[]};var locale = 'en';${version === '0.202.0' ? 'globalThis.tips=messages[locale][4];globalThis.specMode=tips.specMode;' : ''}</script>`,
+    '.vite/renderer/main_window/index.html': `<script>var messages = {en:[]};var locale = 'en';${version !== '0.201.0' ? 'globalThis.tips=messages[locale][4];globalThis.specMode=tips.specMode;' : ''}</script>`,
     'unrelated.bin': 'UNTOUCHED',
   };
   const asar = writeAsar(empty, new Map(Object.entries(files).map(([key, value]) => [key, Buffer.from(value)])));
@@ -172,9 +172,9 @@ test('a receipt from another client version cannot authorize installation or res
   assert.throws(() => patchClient(f.asar, f.exe, f.profile, { ...f.pack, clientVersion: '0.202.0' }), /版本不匹配/);
 });
 
-test('the 0.202 startup loader supplies every new shortcut tip before the app mounts', async () => {
-  const f = fixture('0.202.0');
-  const shipped = JSON.parse(await readFile(new URL('../pack/zh-CN.json', import.meta.url)));
+for (const version of supportedVersions.filter(version => version !== '0.201.0')) test(`${version} startup loader supplies every shortcut tip before the app mounts`, async () => {
+  const f = fixture(version);
+  const shipped = JSON.parse(await readFile(new URL(`../${packPath(version)}`, import.meta.url)));
   const result = patchClient(f.asar, f.exe, f.profile, { ...f.pack, loader: shipped.loader });
   const html = parseAsar(result.asar).read(f.profile.files.html.path).toString();
   const context = { navigator: { languages: ['zh-Hans-CN'] } };

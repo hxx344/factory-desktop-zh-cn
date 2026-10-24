@@ -1,8 +1,8 @@
 {
-  "version": "0.3.1",
+  "version": "0.3.2",
   "clientVersion": "0.201.0",
   "locale": "zh-CN",
-  "adapterSha256": "518cff6667f674198ff90cb20252fff1fc3902293dcdf317d989bf51c2ebf642",
+  "adapterSha256": "f3b479f93ce6778de93140e61915e0e7bc73ef764467f58e8c107d1e30756c7c",
   "hardcoded": {
     "files": {
       ".vite/build/index-Cj61H4vQ.js": "06d3a97caad2d0760d21e6a2c40c115a15480ee8c88bd82c858166ddd588e2a4",
@@ -8544,7 +8544,8 @@
         "Testing all the models to find the one that agrees with you.": "badge_83",
         "You were here before it was cool.": "badge_86"
       }
-    }
+    },
+    "sourceIds": {}
   },
   "resources": {
     "academy": {
@@ -32982,6 +32983,6 @@
       "badgeTexts": 87
     }
   },
-  "inputsSha256": "678fbd505fc0e148eb471a7d772249ff9c8c574dfb630bf14ef07154276ad5e0",
-  "digest": "7d072fac84d8cde9b9c261addaa6ec3ffd9c3aea78ee87caac822e9b74716590"
+  "inputsSha256": "aecf94e018d1d576bea8913d661ffc8e179a69cd60d9a1f29e5b62cf39f54a16",
+  "digest": "454fd2dfed8db4446d2bdcdd37a920dee4c31fb506a56d925f95d026a032c810"
 }

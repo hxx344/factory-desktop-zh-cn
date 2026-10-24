@@ -6,7 +6,7 @@ export async function readFullCatalog(version = latestVersion) {
   await readProfile(version);
   const inventory = JSON.parse(await readFile(new URL(`../profiles/${version}.catalog.json`, import.meta.url)));
   const translations = {}, preserved = {};
-  for (const name of ['seed', 'worker-1', 'worker-2', 'worker-3', 'hardcoded', 'update-0.202.0']) {
+  for (const name of ['seed', 'worker-1', 'worker-2', 'worker-3', 'hardcoded', 'update-0.202.0', 'update-0.204.0', 'update-0.205.0']) {
     const path = new URL(`../translations/full/${name}.json`, import.meta.url);
     let values;
     try { values = JSON.parse(await readFile(path)); }

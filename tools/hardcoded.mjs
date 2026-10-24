@@ -9,6 +9,7 @@ export function hardcodedExpression(entry) {
     if (!['name', 'description', 'quip'].includes(entry.field)) throw new Error('Invalid badge display field');
     return `__factoryZhBadge(${JSON.stringify(entry.field)},${entry.raw})`;
   }
+  if (entry.lookup === 'source') return `__factoryZhSource(${entry.raw})`;
   if (entry.runtime === 'early') {
     if (!/^[A-Za-z_$][\w$]*$/.test(entry.electron ?? '') || typeof entry.translation !== 'string') throw new Error('Invalid early-startup localization entry');
     return `(()=>{try{const l=${entry.electron}.app.getPreferredSystemLanguages()[0];if(/^zh(?:-|$)/i.test(l))return ${JSON.stringify(entry.translation)}}catch{}return ${entry.raw}})()`;
@@ -71,4 +72,8 @@ export function localizedHelper(source, original, binding) {
 
 export function badgeHelper(mapping) {
   return `var __factoryZhBadgeIds=${JSON.stringify(mapping ?? {})};function __factoryZhBadge(field,value){if(typeof value!=="string")return value;const id=__factoryZhBadgeIds[field]?.[value];return typeof id==="string"?__factoryZhUi(id,value):value}`;
+}
+
+export function sourceHelper(mapping) {
+  return `var __factoryZhSourceIds=${JSON.stringify(mapping ?? {})};function __factoryZhSource(value){if(typeof value!=="string")return value;const id=__factoryZhSourceIds[value];return typeof id==="string"?__factoryZhUi(id,value):value}`;
 }

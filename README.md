@@ -1,16 +1,16 @@
 # Factory Desktop 简体中文语言包
 
-为 **Windows x64 / Factory Desktop 0.202.0、0.201.0 标准安装版**提供全量静态界面词典。自动识别客户端版本，通过客户端自己的 i18next 词典和语言切换机制加载中文。
+为 **Windows x64 / Factory Desktop 0.205.0、0.204.0、0.202.0、0.201.0 标准安装版**提供全量静态界面词典。自动识别客户端版本，通过客户端自己的 i18next 词典和语言切换机制加载中文。
 
-**v0.3.0 已适配 Factory 0.202.0，处理全部 17,803 个界面词条和 78 个原生菜单、对话框词条。** 其中 17,589 项译为中文，292 项为品牌、命令、快捷键、单位或纯插值格式，逐项记录理由后保留。本次补充 96 条不同的新原文，涵盖 Chrome Cookie 导入、PR 自动修复、收件箱、文件分享、可视化和分析页面。0.201.0 继续保持原来的 17,851 个界面词条和 85 个原生词条覆盖；不能用英文回退满足覆盖率。
+**v0.3.2 已适配 Factory 0.205.0 和 0.204.0，并继续支持 0.202.0、0.201.0。** 0.205.0 的 17,649 个界面词条和 81 个原生菜单、对话框词条均已处理，其中 17,428 项译为中文，302 项为品牌、命令、快捷键、单位或纯插值格式，逐项记录理由后保留。0.204.0 同样完整处理 17,943 个界面词条和 81 个原生词条；四版都要求零缺译，不能用英文回退满足覆盖率。两次上游更新在共享稳定 sourceID 尾部追加 397 条不同原文，不重排旧 ID。
 
-另外审核了新版 1,482 处 JSX、界面字段和本地静态提示候选，补充本地化 595 处；其余 887 处为图标、语法标签、品牌、内部判别键、协议数据或原始诊断数据，按具体位置保留。29 个成就徽章的 87 条文字在显示边界本地化，保留内部名称和原始统计数据；其中 1 条 Go 代码保持原样。系统界面、用户内容、模型输出和服务端动态内容不属于这份静态词典的覆盖计数。
+另外审核了 0.205.0 的 1,538 处 JSX、界面字段和本地静态提示候选，补充本地化 601 处；其余 937 处为图标、语法标签、品牌、内部判别键、协议数据或原始诊断数据，按具体位置保留。动态工具名称只在显示读取边界翻译，不改内部映射键或用户内容。29 个成就徽章的 87 条文字在显示边界本地化，保留内部名称和原始统计数据；其中 1 条 Go 代码保持原样。系统界面、用户内容、模型输出和服务端动态内容不属于这份静态词典的覆盖计数。
 
 ![隔离客户端副本中的中文登录界面](docs/screenshots/login-zh-CN.png)
 
 ## 使用
 
-1. 从 Releases 下载 `Factory-Desktop-zh-CN-v0.3.1.zip` 并解压到普通文件夹。
+1. 从 Releases 下载 `Factory-Desktop-zh-CN-v0.3.2.zip` 并解压到普通文件夹。
 2. 正常退出 Factory，然后双击 `install.cmd`。
 3. 重新打开 Factory。中文系统会按系统语言选择简体中文；如果已有其他语言偏好，在 **Settings → General → Language** 中选择 **简体中文**。
 
@@ -23,7 +23,7 @@
 命令行可显式指定 `app-x.y.z` 安装目录：
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\factory-zh.ps1 -Action install -InstallDir "$env:LOCALAPPDATA\Factory\app-0.202.0"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\factory-zh.ps1 -Action install -InstallDir "$env:LOCALAPPDATA\Factory\app-0.205.0"
 ```
 
 `-Action` 支持 `install`、`status`、`restore`。只在启动本次脚本时使用 ExecutionPolicy 参数，不更改系统策略。
@@ -49,11 +49,11 @@ npm test
 powershell.exe -NoProfile -File tools/package.ps1
 ```
 
-提取和构建默认使用本机最新适配版本的原版 Factory。也可运行 `node tools/build-pack.mjs <原版ASAR路径> 0.201.0` 构建旧版词典。提取器只解析资源中的静态对象，不执行客户端代码。生成的英文参考词典保存在 `.local/`，不提交或随语言包分发。
+提取和构建默认使用本机最新适配版本的原版 Factory。也可运行 `node tools/build-pack.mjs <原版ASAR路径> 0.201.0` 构建指定版本词典。提取器只解析资源中的静态对象，不执行客户端代码。生成的英文参考词典保存在 `.local/`，不提交或随语言包分发。
 
 `translations/full/*.json` 是全量译文，以稳定 ID 对应 `profiles/<版本>.catalog.json` 中的源文指纹；新版只追加源文 ID，旧 ID 保持不变。`preserve-*.json` 逐项说明技术名称等保留原因。`translations/context-overrides.json` 和原有 `overrides.json`、`desktop.json` 提供按键修正，`translations/badges.json` 补充成就展示文案，`translations/loader.json` 提供启动页提示。`phrases.tsv` 保留首版共享译文记录，`hardcoded-texts.tsv` 保留补充文案的复核对照；实际完整加载值以全量 JSON 和按键覆盖为准。
 
-构建要求原版键集合完全一致、零缺译、零空译，未变原文或没有汉字的值必须有具体保留说明。检查插值、富文本标签嵌套、Markdown 链接、普通 URL、内联代码和代码围栏。`pack/zh-CN.json` 为最新适配版本，`pack/0.201.0/zh-CN.json` 为旧版；分别记录中文译文、技术保留和覆盖总数。`profiles/<版本>.hardcoded.json` 记录各硬编码候选的处置、固定补丁位置和组件订阅入口，语言加载变量也按版本独立登记。
+构建要求原版键集合完全一致、零缺译、零空译，未变原文或没有汉字的值必须有具体保留说明。检查插值、富文本标签嵌套、Markdown 链接、普通 URL、内联代码和代码围栏。`pack/zh-CN.json` 为最新适配版本，较旧版本位于 `pack/<版本>/zh-CN.json`；分别记录中文译文、技术保留和覆盖总数。`profiles/<版本>.hardcoded.json` 记录各硬编码候选的处置、固定补丁位置和组件订阅入口，语言加载变量也按版本独立登记。
 
 已在 Windows 原生环境中验证安装、重复安装、更新、恢复、中途失败回滚、未知文件拒绝和英文回退；客户端副本验证了中文登录页、英文/中文切换及重启后的偏好保留，并检查全部修改脚本的可解析性。增加了富文本错误、代码/链接保护、延迟字段赋值和语言切换缓存的回归检查，并复核高风险权限与计费文案。隔离验收未登录真实账户，因此未对全部登录后业务页面做交互验收。GitHub Actions 运行 Windows 检查与打包，不使用 WSL。
 

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { runInNewContext } from 'node:vm';
 import { textHash, protectedTokens, validateTranslation } from '../tools/quality.mjs';
-import { applyHardcoded, rendererHelper, badgeHelper, localizedHelper } from '../tools/hardcoded.mjs';
+import { applyHardcoded, rendererHelper, badgeHelper, sourceHelper, localizedHelper } from '../tools/hardcoded.mjs';
 
 const reference = source => ({ sha256: textHash(source), ...protectedTokens(source) });
 
@@ -86,4 +86,19 @@ test('badge display translation preserves the data used for internal matching an
   assert.equal(context.Badge(badge), 'Night Owl');
   assert.equal(context.__factoryZhBadge('name', 'user data'), 'user data');
   assert.equal(subscriptions, 2);
+});
+
+test('source display lookup translates only known UI values and leaves source maps and user content intact', () => {
+  let language = 'zh-CN';
+  const context = { eon: () => ({ t: (_, values) => language === 'zh-CN' ? '网页搜索' : values.defaultValue }) };
+  const source = 'const labels={web:"Web Search"};function display(key){return labels[key]}globalThis.labels=labels;globalThis.display=display;';
+  const raw = 'labels[key]';
+  const start = source.indexOf(raw, source.indexOf('function display'));
+  const manifest = { files: { renderer: textHash(source) }, entries: [{ file: 'renderer', start, end: start + raw.length, raw, runtime: 'renderer', lookup: 'source' }] };
+  runInNewContext(`${rendererHelper}${sourceHelper({'Web Search':'source_0'})}${applyHardcoded(source, 'renderer', manifest)}`, context);
+  assert.equal(context.display('web'), '网页搜索');
+  assert.equal(context.labels.web, 'Web Search');
+  language = 'en';
+  assert.equal(context.display('web'), 'Web Search');
+  assert.equal(context.__factoryZhSource('user-authored text'), 'user-authored text');
 });

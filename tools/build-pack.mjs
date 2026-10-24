@@ -69,7 +69,7 @@ for (const [name, original, target, localOverrides] of [['renderer', english, re
 const version = JSON.parse(await readFile(new URL('../package.json', import.meta.url))).version;
 const hardcodedProfile = JSON.parse(await readFile(new URL(`../profiles/${profile.version}.hardcoded.json`, import.meta.url)));
 const badges = JSON.parse(await readFile(new URL('../translations/badges.json', import.meta.url)));
-const hardcoded = { files: hardcodedProfile.files, entries: [], useTranslation: profile.adapter.renderer.useTranslation, memoOwners: hardcodedProfile.memoOwners, languageSubscribers: hardcodedProfile.languageSubscribers, badgeIds: { name: {}, description: {}, quip: {} } };
+const hardcoded = { files: hardcodedProfile.files, entries: [], useTranslation: profile.adapter.renderer.useTranslation, memoOwners: hardcodedProfile.memoOwners, languageSubscribers: hardcodedProfile.languageSubscribers, badgeIds: { name: {}, description: {}, quip: {} }, sourceIds: {} };
 resources.hardcoded = {};
 desktop.desktop.hardcoded = {};
 for (const [index, entry] of badges.texts.entries()) {
@@ -79,12 +79,17 @@ for (const [index, entry] of badges.texts.entries()) {
   hardcoded.badgeIds[entry.field][entry.source] = key;
   resources.hardcoded[key] = entry.target;
 }
+for (const [source, id] of Object.entries(hardcodedProfile.sourceIds ?? {})) {
+  if (!/^(0|[1-9]\d*)$/.test(id) || full.inventory.sources[id]?.sha256 !== textHash(source) || full.translations[id] === undefined) throw new Error(`动态显示源文映射无效：${source}`);
+  hardcoded.sourceIds[source] = id;
+  resources.hardcoded[id] = full.translations[id];
+}
 for (const entry of hardcodedProfile.entries) {
   if (entry.decision === 'preserved') {
     if (!entry.reason?.trim()) throw new Error(`硬编码保留项缺少审核说明：${entry.file}:${entry.start}`);
     continue;
   }
-  if (entry.lookup === 'badge') { hardcoded.entries.push(entry); continue; }
+  if (entry.lookup === 'badge' || entry.lookup === 'source') { hardcoded.entries.push(entry); continue; }
   if (entry.decision !== 'translated' || full.translations[entry.id] === undefined) throw new Error(`存在未处理硬编码：${entry.file}:${entry.start}`);
   if (full.inventory.sources[entry.id].sha256 !== entry.sourceHash) throw new Error('硬编码源文指纹不匹配');
   const text = full.translations[entry.id];

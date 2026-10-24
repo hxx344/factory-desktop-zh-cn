@@ -1,0 +1,44 @@
+{
+  "version": "0.204.0",
+  "platform": "win32",
+  "arch": "x64",
+  "exeSha256": "51a086761b2350a564f84c68ee53415300ea35635a5bd4e76deaa2725ad1fadc",
+  "asarSha256": "4cf2edd89858c47be793d361818c4ec449b6f0e5c6be436891497073afad5805",
+  "adapter": {
+    "renderer": {
+      "enum": "hf",
+      "supported": "gnt",
+      "imports": "hOu",
+      "preload": "Bt",
+      "i18n": "ccn",
+      "useTranslation": "ce",
+      "resolve": "p_c",
+      "switch": "gOu",
+      "persist": "xqu",
+      "logger": "Ye",
+      "englishRoot": "W9t",
+      "mount": "R$o.createRoot(document.getElementById(\"root\")).render(c.jsx(lEc,{env:vOt,children:c.jsx(Xif,{})}));"
+    },
+    "main": {
+      "enum": "Se",
+      "supported": "D3",
+      "resources": "aE",
+      "englishRoot": "sE",
+      "i18n": "ne"
+    }
+  },
+  "files": {
+    "renderer": {
+      "path": ".vite/renderer/main_window/assets/index-D5VdbPv5.js",
+      "sha256": "ac85277dd9820e3dda87e9e547867e25dfdc73fd115d1587fb7ea6c17b056523"
+    },
+    "main": {
+      "path": ".vite/build/initLifecycle-Cl2ZZ5qo.js",
+      "sha256": "235facdafa61b2be6790b963d9aeed2787e8b7c99b52d8abf2ab5db7a3fa79e8"
+    },
+    "html": {
+      "path": ".vite/renderer/main_window/index.html",
+      "sha256": "8064922721486efa2a4a7785907bcf08c15f4a3f2d597b025ec95a4b732e7ccb"
+    }
+  }
+}

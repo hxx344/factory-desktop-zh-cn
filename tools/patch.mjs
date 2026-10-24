@@ -1,5 +1,5 @@
 import { parseAsar, writeAsar, sha256 } from './asar.mjs';
-import { applyHardcoded, rendererHelper, mainHelper, badgeHelper, localizedHelper } from './hardcoded.mjs';
+import { applyHardcoded, rendererHelper, mainHelper, badgeHelper, sourceHelper, localizedHelper } from './hardcoded.mjs';
 import { readFile } from 'node:fs/promises';
 
 export async function adapterDigest() {
@@ -39,7 +39,7 @@ export function patchClient(asarBytes, exeBytes, profile, pack) {
   // The vendor mounts its language preference observer only after sign-in.
   // Apply the same preference on startup so the signed-out screen is localized too.
   const mount = r.mount;
-  const startup = `${pack.hardcoded ? localizedHelper(rendererHelper, 'eon', r.i18n) + badgeHelper(pack.hardcoded.badgeIds) : ''}${r.i18n}();(async()=>{let timer;try{const p=await Promise.race([window.electronAPI?.i18n?.getPreference()??Promise.resolve(null),new Promise(r=>{timer=setTimeout(()=>r(null),4000)})]);if(p){const l=${r.resolve}({saved:p.savedLocale,candidates:p.systemLanguages,supported:${r.supported}});await ${r.switch}(l)&&${r.persist}(l)}}catch(e){${r.logger}("Failed to apply startup language",{cause:e})}finally{clearTimeout(timer)}${mount}})();`;
+  const startup = `${pack.hardcoded ? localizedHelper(rendererHelper, 'eon', r.i18n) + badgeHelper(pack.hardcoded.badgeIds) + sourceHelper(pack.hardcoded.sourceIds) : ''}${r.i18n}();(async()=>{let timer;try{const p=await Promise.race([window.electronAPI?.i18n?.getPreference()??Promise.resolve(null),new Promise(r=>{timer=setTimeout(()=>r(null),4000)})]);if(p){const l=${r.resolve}({saved:p.savedLocale,candidates:p.systemLanguages,supported:${r.supported}});await ${r.switch}(l)&&${r.persist}(l)}}catch(e){${r.logger}("Failed to apply startup language",{cause:e})}finally{clearTimeout(timer)}${mount}})();`;
   renderer = replaceOnce(renderer, `${r.i18n}();${mount}`, startup);
   let main = asar.read(profile.files.main.path).toString('utf8');
   main = applyHardcoded(main, profile.files.main.path, pack.hardcoded);
