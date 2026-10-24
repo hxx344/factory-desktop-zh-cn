@@ -1,8 +1,19 @@
-# Factory 云端每日维护
+# Factory 维护方式与历史云端协议
 
-每日调度在 ChatGPT 托管云端任务中设置为 `Asia/Shanghai` 上午 09:00。调度负责版本检查和 AI 适配；本仓库的 Windows Actions 负责独立验收、提交与正式发布。无需把开发电脑的登录令牌或 API key 复制到云端。
+## 当前方式：本地手动触发
 
-## 每次运行
+按用户 2026-10-24 的要求，维护切回本地手动触发，不创建或恢复本地每日任务。用户在本项目聊天发送“检查 Factory 更新并汉化发布”后，才开始一次维护；切换维护方式本身不触发版本适配或发布。
+
+1. 从本地仓库检查官方最新稳定版本、已有适配和正式 Release。没有新版本且没有未完成发布时结束。
+2. 有变化时取得官方原版资源，复用已有译文，补齐新增及修改文案，保留旧版适配。
+3. 在 Windows 原生环境中完成与改动相称的词典、安装、恢复、界面及打包验证，禁止使用 WSL；内容和环境不变时复用有效结果。
+4. 通过本地 Git 保留用户作者身份及 Codex 署名，提交、推送并核实远端；等待必要的 `Windows checks` CI 后按既有流程正式发布并核实资产。
+
+原托管每日计划 `6ad73ca5bae48191b9357c2c6d860017` 已核实为 `is_enabled=false`，配置与历史保留。专用的 `Cloud Factory maintenance` 工作流已禁用，正常的 `Windows checks` CI 保持启用。下述云端桥协议仅保留供以后明确恢复时参考，本地手动维护不使用 GitHub 连接器控制 Issue，也不复制本地登录令牌到云端。
+
+## 历史云端每次运行
+
+原每日调度在 ChatGPT 托管云端任务中设置为 `Asia/Shanghai` 上午 09:00，负责版本检查和 AI 适配；Windows Actions 负责独立验收、提交与正式发布。
 
 1. 查询官方 `https://api.factory.ai/api/desktop/latest-version`，用 `https://downloads.factory.ai/factory-desktop/LATEST` 复核；对照 main、profiles、pack 和最新正式 Release。没有变化且没有未完成发布时安静结束。
 2. 对新版本从官方完整 nupkg 取得资源。下载器读取版本目录的 `RELEASES`，校验大小与 SHA1，并在 Windows 验证签名和 profile 内 SHA256。Linux 云端可做静态分析；Windows 运行验收交给 Actions，禁止使用 WSL。
@@ -45,4 +56,4 @@
 
 若 main 已变化，重新读取最新 main，基于新基线重建候选并创建新请求。若代码已提交但发布未完成，先对照版本、tag 和草稿；用当前 main 和其 tree 提交零差异请求来恢复发布，不制造空版本。网络或验收失败时不发布不匹配内容。
 
-需要停用云端执行入口时可暂停托管计划或禁用 `Cloud Factory maintenance` 工作流。原本地每日任务只在托管调度、连接器大文件传输、真实 Windows 运行和发布通路均验收通过后暂停，保留配置便于恢复。
+恢复云端执行必须先取得用户明确指令，再复核托管计划、连接器权限、Windows 验收及发布通路。当前保持本地手动触发，不因保留历史配置或桥代码而恢复任何每日任务。

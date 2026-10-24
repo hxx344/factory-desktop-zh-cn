@@ -59,10 +59,10 @@ powershell.exe -NoProfile -File tools/package.ps1
 
 分发包只包含本项目脚本、译文和版本清单，不包含 Factory EXE、ASAR、用户配置、凭据或会话。
 
-## 云端维护
+## 维护方式
 
-云端每日任务负责检查官方版本和完成汉化适配，Windows GitHub Actions 负责原生验收与发布。整个流程从仓库和官方安装包取得资源，不依赖开发电脑或本机 Factory。无更新时跳过重复构建和发布。
+维护默认由本地手动触发。在本项目聊天中发送“检查 Factory 更新并汉化发布”，即可从本地仓库执行版本检查、全量汉化适配、必要验证、提交、推送及正式发布。无更新时跳过重复构建和发布，不创建或恢复每日定时任务。
 
-云端连接器通过 Git blob/tree 和仓库控制 Issue 提交候选内容；受限工作流独立验证请求、候选树和产物，再按原作者身份提交并发布。只有固定账号的结构化请求可进入执行流程，候选代码不能修改发布桥和工作流，也不会接触发布用的写入令牌。见 [云端维护说明](docs/cloud-maintenance.md)。
+云端每日计划已停用，专用的 `Cloud Factory maintenance` 工作流已禁用，正常的 `Windows checks` CI 保持启用。既有云端执行桥保留供明确恢复时使用，日常本地维护不经过连接器控制 Issue。见 [维护说明与历史云端协议](docs/cloud-maintenance.md)。
 
 技术依据：[Electron ASAR 完整性验证](https://www.electronjs.org/docs/latest/tutorial/asar-integrity)、[i18next 资源配置](https://www.i18next.com/overview/configuration-options)。
