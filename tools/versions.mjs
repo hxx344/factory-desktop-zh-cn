@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { readAsar, sha256 } from './asar.mjs';
 import { adapterDigest } from './patch.mjs';
 
-export const supportedVersions = ['0.201.0', '0.202.0', '0.204.0', '0.205.0'];
+export const supportedVersions = ['0.201.0', '0.202.0', '0.204.0', '0.205.0', '0.206.0'];
 export const latestVersion = supportedVersions.at(-1);
 
 export function packPath(version) {
