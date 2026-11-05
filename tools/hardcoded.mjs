@@ -75,5 +75,18 @@ export function badgeHelper(mapping) {
 }
 
 export function sourceHelper(mapping) {
+  const templates = [];
+  for (const [source, id] of Object.entries(mapping ?? {})) {
+    const parts = source.split(/(\{\{expression\d+\}\})/g);
+    if (parts.length === 1) continue;
+    if (!parts[0] || !parts.at(-1)) throw new Error('显示模板必须有固定前缀和后缀');
+    const keys = [];
+    const pattern = parts.map((part, index) => {
+      if (index % 2) { keys.push(part.slice(2, -2)); return '([\\s\\S]*?)'; }
+      return part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }).join('');
+    templates.push([id, `^${pattern}$`, keys]);
+  }
+  if (templates.length) return `var __factoryZhSourceIds=${JSON.stringify(mapping ?? {})},__factoryZhSourceTemplates=${JSON.stringify(templates)}.map(([id,pattern,keys])=>[id,new RegExp(pattern),keys]);function __factoryZhSource(value){if(typeof value!=="string")return value;const id=__factoryZhSourceIds[value];if(typeof id==="string")return __factoryZhUi(id,value);for(const[id,pattern,keys]of __factoryZhSourceTemplates){const match=pattern.exec(value);if(match&&match[0]===value){const values={};for(let i=0;i<keys.length;i++)values[keys[i]]=match[i+1];return __factoryZhUi(id,value,values)}}return value}`;
   return `var __factoryZhSourceIds=${JSON.stringify(mapping ?? {})};function __factoryZhSource(value){if(typeof value!=="string")return value;const id=__factoryZhSourceIds[value];return typeof id==="string"?__factoryZhUi(id,value):value}`;
 }

@@ -102,3 +102,22 @@ test('source display lookup translates only known UI values and leaves source ma
   assert.equal(context.display('web'), 'Web Search');
   assert.equal(context.__factoryZhSource('user-authored text'), 'user-authored text');
 });
+
+test('reviewed display templates preserve inserted values and leave original model descriptions unchanged', () => {
+  const description = 'Choose the model for {{expression0}}-complexity Task tool subagents.';
+  let language = 'zh-CN';
+  const original = { description: 'Choose the model for high-complexity Task tool subagents.' };
+  const context = { original, eon: () => ({ t: (_key, values) => language === 'zh-CN' ? `选择 ${values.expression0} 复杂度子智能体的模型。` : values.defaultValue }) };
+  runInNewContext(`${rendererHelper}${sourceHelper({ [description]: '0' })}globalThis.display=value=>__factoryZhSource(value);`, context);
+  assert.equal(context.display(original.description), '选择 high 复杂度子智能体的模型。');
+  assert.equal(original.description, 'Choose the model for high-complexity Task tool subagents.');
+  assert.equal(context.display('Choose the model for custom.*(x)-complexity Task tool subagents.'), '选择 custom.*(x) 复杂度子智能体的模型。');
+  assert.equal(context.display('Choose the model for -complexity Task tool subagents.'), '选择  复杂度子智能体的模型。');
+  assert.equal(context.display('Choose the model for first\nsecond-complexity Task tool subagents.'), '选择 first\nsecond 复杂度子智能体的模型。');
+  assert.equal(context.display(`${original.description}\n`), `${original.description}\n`);
+  assert.equal(context.display('user-authored explanation'), 'user-authored explanation');
+  language = 'en';
+  assert.equal(context.display(original.description), original.description);
+  const legacyMapping = { 'Web Search': '1' };
+  assert.equal(sourceHelper(legacyMapping), `var __factoryZhSourceIds=${JSON.stringify(legacyMapping)};function __factoryZhSource(value){if(typeof value!=="string")return value;const id=__factoryZhSourceIds[value];return typeof id==="string"?__factoryZhUi(id,value):value}`);
+});

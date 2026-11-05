@@ -219,8 +219,6 @@
   "common.cloudDeprecationBanner.goToDroidComputers": "前往 Droid Computers",
   "common.subscriptionBanner.gracePeriod": "付款已逾期。使用权限将于 {{date}} 暂停。请<billingLink>前往账单页面</billingLink>处理。",
   "common.subscriptionBanner.overdueBlocked": "你的账户有逾期账单，当前无法访问。请<billingLink>前往账单页面</billingLink>恢复访问。",
-  "common.subscriptionBanner.freeTier": "你尚未付费订阅。请<billingLink>升级套餐</billingLink>以使用托管模型和云端功能。",
-  "common.subscriptionBanner.freeTierWithByok": "你尚未付费订阅。请<billingLink>升级套餐</billingLink>以使用托管模型和云端功能，或<byokLink>使用自己的 API 密钥</byokLink>。",
   "common.visualArtifactViewer.noVisualOutputAvailable": "暂无可视化输出",
   "common.visualArtifactViewer.theVisualContentAppearsToBe": "可视化内容似乎为空或无效。",
   "common.visualArtifactViewer.theVisualFileMayContainInvalid": "可视化文件可能包含无效的 HTML。",

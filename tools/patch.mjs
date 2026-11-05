@@ -41,6 +41,17 @@ export function patchClient(asarBytes, exeBytes, profile, pack) {
   const mount = r.mount;
   const startup = `${pack.hardcoded ? localizedHelper(rendererHelper, 'eon', r.i18n) + badgeHelper(pack.hardcoded.badgeIds) + sourceHelper(pack.hardcoded.sourceIds) : ''}${r.i18n}();(async()=>{let timer;try{const p=await Promise.race([window.electronAPI?.i18n?.getPreference()??Promise.resolve(null),new Promise(r=>{timer=setTimeout(()=>r(null),4000)})]);if(p){const l=${r.resolve}({saved:p.savedLocale,candidates:p.systemLanguages,supported:${r.supported}});await ${r.switch}(l)&&${r.persist}(l)}}catch(e){${r.logger}("Failed to apply startup language",{cause:e})}finally{clearTimeout(timer)}${mount}})();`;
   renderer = replaceOnce(renderer, `${r.i18n}();${mount}`, startup);
+  const rendererChunks = pack.hardcoded?.rendererChunks ?? [];
+  if (!Array.isArray(rendererChunks) || new Set(rendererChunks).size !== rendererChunks.length) throw new Error('独立界面模块清单无效');
+  const rendererDirectory = profile.files.renderer.path.slice(0, profile.files.renderer.path.lastIndexOf('/') + 1);
+  const rendererName = profile.files.renderer.path.slice(rendererDirectory.length);
+  if (rendererChunks.length) {
+    for (const file of rendererChunks) {
+      if (typeof file !== 'string' || !file.startsWith(rendererDirectory) || !/^[\w-]+\.js$/.test(file.slice(rendererDirectory.length)) || file === profile.files.renderer.path || !Object.hasOwn(pack.hardcoded.files, file)) throw new Error('独立界面模块未经过指纹登记');
+      if (!pack.hardcoded.entries.some(entry => entry.file === file && entry.runtime === 'renderer')) throw new Error('独立界面模块缺少显示补丁');
+    }
+    renderer += '\nexport {__factoryZhUi};\n';
+  }
   let main = asar.read(profile.files.main.path).toString('utf8');
   main = applyHardcoded(main, profile.files.main.path, pack.hardcoded);
   main = replaceOnce(main, `${m.supported}=[${m.enum}.English,${m.enum}.Japanese,`, `${m.supported}=[${m.enum}.English,${m.enum}.ChineseSimplified,${m.enum}.Japanese,`);
@@ -58,7 +69,9 @@ export function patchClient(asarBytes, exeBytes, profile, pack) {
   ]);
   for (const file of Object.keys(pack.hardcoded?.files ?? {})) {
     if (file === profile.files.renderer.path || file === profile.files.main.path) continue;
-    replacements.set(file, Buffer.from(applyHardcoded(asar.read(file).toString('utf8'), file, pack.hardcoded)));
+    let source = applyHardcoded(asar.read(file).toString('utf8'), file, pack.hardcoded);
+    if (rendererChunks.includes(file)) source = `import {__factoryZhUi} from ${JSON.stringify(`./${rendererName}`)};\n${source}`;
+    replacements.set(file, Buffer.from(source));
   }
   const patchedAsar = writeAsar(asar, replacements);
   const patchedExe = patchIntegrity(exeBytes, sha256(asar.rawHeader), sha256(parseAsar(patchedAsar).rawHeader));

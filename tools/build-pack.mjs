@@ -69,7 +69,7 @@ for (const [name, original, target, localOverrides] of [['renderer', english, re
 const version = JSON.parse(await readFile(new URL('../package.json', import.meta.url))).version;
 const hardcodedProfile = JSON.parse(await readFile(new URL(`../profiles/${profile.version}.hardcoded.json`, import.meta.url)));
 const badges = JSON.parse(await readFile(new URL('../translations/badges.json', import.meta.url)));
-const hardcoded = { files: hardcodedProfile.files, entries: [], useTranslation: profile.adapter.renderer.useTranslation, memoOwners: hardcodedProfile.memoOwners, languageSubscribers: hardcodedProfile.languageSubscribers, badgeIds: { name: {}, description: {}, quip: {} }, sourceIds: {} };
+const hardcoded = { files: hardcodedProfile.files, entries: [], useTranslation: profile.adapter.renderer.useTranslation, memoOwners: hardcodedProfile.memoOwners, languageSubscribers: hardcodedProfile.languageSubscribers, ...(hardcodedProfile.rendererChunks ? { rendererChunks: hardcodedProfile.rendererChunks } : {}), badgeIds: { name: {}, description: {}, quip: {} }, sourceIds: {} };
 resources.hardcoded = {};
 desktop.desktop.hardcoded = {};
 for (const [index, entry] of badges.texts.entries()) {
