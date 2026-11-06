@@ -5,7 +5,7 @@ import { flatten, placeholders } from './catalog.mjs';
 import assert from 'node:assert/strict';
 import { readFullCatalog } from './full-catalog.mjs';
 import { adapterDigest } from './patch.mjs';
-import { supportedVersions, readProfile, packPath } from './versions.mjs';
+import { supportedVersions, latestVersion, readProfile, packPath } from './versions.mjs';
 
 const phrases = await readFile('translations/phrases.tsv', 'utf8');
 const overrides = JSON.parse(await readFile('translations/overrides.json'));
@@ -31,6 +31,12 @@ for (const version of supportedVersions) {
   assert.deepEqual(Object.keys(flatten({ desktop: native })).sort(), Object.keys(full.inventory.desktop).sort());
   assert.equal(pack.clientVersion, version);
   assert.equal(full.inventory.clientVersion, version);
+  if (version === latestVersion || pack.sourceHashes) {
+    for (const kind of ['renderer', 'desktop']) {
+      assert.deepEqual(pack.sourceHashes?.[kind], Object.fromEntries(Object.entries(full.inventory[kind]).map(([key, id]) => [key, full.inventory.sources[id].sha256])), `${kind} 原文指纹与词典不一致`);
+    }
+    assert.deepEqual(Object.keys(pack.sourceHashes.loader).sort(), Object.keys(flatten(pack.loader)).sort(), '启动页原文指纹键不一致');
+  }
   for (const name of ['renderer', 'desktop']) {
     for (const key of Object.keys(full.inventory[name])) knownKeys[name].add(key);
     assert.equal(pack.coverage[name].covered, Object.keys(full.inventory[name]).length);

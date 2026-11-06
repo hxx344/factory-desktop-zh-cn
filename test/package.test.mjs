@@ -26,7 +26,7 @@ test('fresh packaging after all source mtimes change produces identical retry as
     'profiles/0.202.0.json': '{"version":"0.202.0"}',
     'pack/0.201.0/zh-CN.json': '{"version":"1.2.3","clientVersion":"0.201.0"}',
   };
-  for (const path of ['README.md', 'LICENSE', 'CHANGELOG.md', 'factory-zh.ps1', 'install.cmd', 'restore.cmd', 'status.cmd', 'docs/screenshots/login-zh-CN.png', ...['cli', 'install', 'patch', 'hardcoded', 'asar', 'versions'].map(name => `tools/${name}.mjs`)]) files[path] = `fixture ${path}\n中文`;
+  for (const path of ['README.md', 'LICENSE', 'CHANGELOG.md', 'factory-zh.ps1', 'install.cmd', 'restore.cmd', 'status.cmd', 'docs/screenshots/login-zh-CN.png', 'node_modules/acorn/dist/acorn.mjs', 'node_modules/acorn/LICENSE', ...['cli', 'install', 'patch', 'hardcoded', 'asar', 'versions', 'compatibility', 'catalog'].map(name => `tools/${name}.mjs`)]) files[path] = `fixture ${path}\n中文`;
   for (const [path, value] of Object.entries(files)) { await mkdir(dirname(join(root, path)), { recursive: true }); await writeFile(join(root, path), value); }
   const first = await packageProject(root, join(temp, 'first'));
   for (const path of Object.keys(files)) await utimes(join(root, path), new Date('2001-01-01Z'), new Date('2026-10-20Z'));
@@ -35,6 +35,8 @@ test('fresh packaging after all source mtimes change produces identical retry as
   assert.deepEqual(await readFile(first.path), await readFile(second.path));
   assert.deepEqual(await readFile(`${first.path}.sha256`), await readFile(`${second.path}.sha256`));
   assert.ok(readZip(await readFile(first.path)).has('pack/0.201.0/zh-CN.json'));
+  assert.ok(readZip(await readFile(first.path)).has('tools/vendor/acorn.mjs'));
+  assert.ok(readZip(await readFile(first.path)).has('tools/vendor/LICENSE.acorn'));
   files['profiles/0.202.0.json'] = '{"version":"0.203.0"}';
   await writeFile(join(root, 'profiles/0.202.0.json'), files['profiles/0.202.0.json']);
   await assert.rejects(packageProject(root, join(temp, 'invalid')), /Profile version mismatch/);

@@ -1,4 +1,9 @@
-import { parse } from 'acorn';
+// Release ZIPs carry the parser so installation never needs npm or network access.
+const acorn = await import('./vendor/acorn.mjs').catch(error => {
+  if (error.code !== 'ERR_MODULE_NOT_FOUND') throw error;
+  return import('acorn');
+});
+export const { parse, parseExpressionAt } = acorn;
 
 export function extractCatalog(source, rootName, unwrap = false) {
   const ast = parse(source, { ecmaVersion: 'latest', sourceType: 'module' });

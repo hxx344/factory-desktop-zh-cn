@@ -1,8 +1,8 @@
 {
-  "version": "0.3.4",
+  "version": "0.4.0",
   "clientVersion": "0.204.0",
   "locale": "zh-CN",
-  "adapterSha256": "cc11abcd3e69909746093a3b8d7f76edcd574eb4258f21a13f00a36e763c12fd",
+  "adapterSha256": "74080f7efb0bd39ee85e39c8e3566431a258a61086c03c384fdb10e76e94de3f",
   "hardcoded": {
     "files": {
       ".vite/build/index-CtLztIeP.js": "f2b5f031ea77e3932756243c07d74aeebf2818e44cdccdf5e742dad375ccd23a",
@@ -33241,6 +33241,6 @@
       "badgeTexts": 87
     }
   },
-  "inputsSha256": "c762af4245666ea68cc0321a161d0fc346c64ae3b2edb4283ed3760a9212f2e3",
-  "digest": "c645e01b52306d88e4322501aadc04cc08a6ae15ffcab23a93310c944aac8f20"
+  "inputsSha256": "5c61b9171e9d085e06810c16c0ea1cad4b0c1bc12acb3a39908b18ba06a2cb15",
+  "digest": "f2d570b4fbecd7d13058c7063f757846993e097ec6f8ecc55aae82f9b4be43d1"
 }

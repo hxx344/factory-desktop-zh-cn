@@ -89,7 +89,7 @@ export async function install(rootInput, profile, pack, options = {}) {
       if (sha256(originals[kind]) !== profile[`${kind}Sha256`]) throw new Error(`原版备份校验失败：${kind}`);
     }
     const patched = patchClient(originals.asar, originals.exe, profile, pack);
-    const receipt = { format: 1, clientVersion: profile.version, version: pack.version, digest: pack.digest, phase: 'prepared', original: { exe: profile.exeSha256, asar: profile.asarSha256 }, previous: before.current, patched: { exe: sha256(patched.exe), asar: sha256(patched.asar) } };
+    const receipt = { format: 2, clientVersion: profile.version, version: pack.version, digest: pack.digest, profile, profileSha256: sha256(Buffer.from(JSON.stringify(profile))), ...(pack.compatibility ? { compatibility: pack.compatibility, coverage: pack.coverage } : {}), phase: 'prepared', original: { exe: profile.exeSha256, asar: profile.asarSha256 }, previous: before.current, patched: { exe: sha256(patched.exe), asar: sha256(patched.asar) } };
     for (const [kind, name] of Object.entries(names)) {
       const temporary = join(root, `${name}.factory-zh-tmp`);
       const handle = await open(temporary, 'wx');

@@ -45,6 +45,11 @@ if (full.missing.length || full.failures.length) {
 }
 const resources = {};
 const desktop = {};
+const sourceHashes = {
+  renderer: Object.fromEntries(Object.entries(flatten(english)).map(([key, source]) => [key, textHash(source)])),
+  desktop: Object.fromEntries(Object.entries(flatten(desktopEnglish)).map(([key, source]) => [key, textHash(source)])),
+  loader: Object.fromEntries(Object.entries(loaderEnglishFlat).map(([key, source]) => [key, textHash(source)])),
+};
 const report = {};
 const untranslated = {};
 for (const [name, original, target, localOverrides] of [['renderer', english, resources, { ...overrides, ...contextual }], ['desktop', desktopEnglish, desktop, nativeOverrides]]) {
@@ -102,7 +107,7 @@ const pack = {
   version, clientVersion: profile.version, locale: 'zh-CN',
   adapterSha256: await adapterDigest(),
   hardcoded,
-  resources, desktop,
+  resources, desktop, sourceHashes,
   loader: loaderResources,
   coverage: report,
 };

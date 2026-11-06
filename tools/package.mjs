@@ -5,7 +5,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { parseArgs } from 'node:util';
 
 const VERSION = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
-const FIXED_FILES = ['README.md', 'LICENSE', 'CHANGELOG.md', 'factory-zh.ps1', 'install.cmd', 'restore.cmd', 'status.cmd', 'pack/zh-CN.json', 'docs/screenshots/login-zh-CN.png', ...['cli', 'install', 'patch', 'hardcoded', 'asar', 'versions'].map(name => `tools/${name}.mjs`)];
+const FIXED_FILES = ['README.md', 'LICENSE', 'CHANGELOG.md', 'factory-zh.ps1', 'install.cmd', 'restore.cmd', 'status.cmd', 'pack/zh-CN.json', 'docs/screenshots/login-zh-CN.png', ...['cli', 'install', 'patch', 'hardcoded', 'asar', 'versions', 'compatibility', 'catalog'].map(name => `tools/${name}.mjs`)];
 const fail = message => { throw new Error(message); };
 const crcTable = Array.from({ length: 256 }, (_, value) => {
   for (let bit = 0; bit < 8; bit++) value = (value >>> 1) ^ ((value & 1) ? 0xedb88320 : 0);
@@ -98,14 +98,16 @@ export async function packageProject(rootInput, outputInput) {
       files.push(packPath);
     }
   }
-  const zip = deterministicZip(await Promise.all(files.map(async path => ({ path, bytes: await sourceFile(root, path) }))));
+  const entries = await Promise.all(files.map(async path => ({ path, bytes: await sourceFile(root, path) })));
+  entries.push({ path: 'tools/vendor/acorn.mjs', bytes: await sourceFile(root, 'node_modules/acorn/dist/acorn.mjs') }, { path: 'tools/vendor/LICENSE.acorn', bytes: await sourceFile(root, 'node_modules/acorn/LICENSE') });
+  const zip = deterministicZip(entries);
   const name = `Factory-Desktop-zh-CN-v${project.version}.zip`, path = join(output, name), temp = `${path}.${randomUUID()}.tmp`;
   const sha256 = createHash('sha256').update(zip).digest('hex');
   await mkdir(output, { recursive: true });
   try { await writeFile(temp, zip, { flag: 'wx' }); await rename(temp, path); }
   finally { await unlink(temp).catch(error => { if (error.code !== 'ENOENT') throw error; }); }
   await writeFile(`${path}.sha256`, `${sha256}  ${name}\n`, 'ascii');
-  return { path, sha256, bytes: zip.length, files: files.length, version: project.version };
+  return { path, sha256, bytes: zip.length, files: entries.length, version: project.version };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

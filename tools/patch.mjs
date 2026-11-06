@@ -3,7 +3,7 @@ import { applyHardcoded, rendererHelper, mainHelper, badgeHelper, sourceHelper, 
 import { readFile } from 'node:fs/promises';
 
 export async function adapterDigest() {
-  return sha256(Buffer.concat([await readFile(new URL('./patch.mjs', import.meta.url)), Buffer.from('\0'), await readFile(new URL('./hardcoded.mjs', import.meta.url))]));
+  return sha256(Buffer.concat(await Promise.all(['patch', 'hardcoded', 'compatibility', 'catalog'].flatMap(name => [readFile(new URL(`./${name}.mjs`, import.meta.url)), Promise.resolve(Buffer.from('\0'))]))));
 }
 
 export function replaceOnce(source, before, after) {
@@ -34,13 +34,19 @@ export function patchClient(asarBytes, exeBytes, profile, pack) {
   for (const binding of Object.values(m)) if (!/^[A-Za-z_$][\w$]*$/.test(binding)) throw new Error('未知主进程适配绑定');
   let renderer = asar.read(profile.files.renderer.path).toString('utf8');
   renderer = applyHardcoded(renderer, profile.files.renderer.path, pack.hardcoded);
-  renderer = replaceOnce(renderer, `${r.supported}=[${r.enum}.English,${r.enum}.Japanese,`, `${r.supported}=[${r.enum}.English,${r.enum}.ChineseSimplified,${r.enum}.Japanese,`);
-  renderer = replaceOnce(renderer, `${r.imports}={[${r.enum}.Japanese]:`, `${r.imports}={[${r.enum}.ChineseSimplified]:async()=>await ${r.preload}(()=>import("./resources-zh-CN.js"),[],import.meta.url),[${r.enum}.Japanese]:`);
+  const forward = profile.compatibility;
+  if (forward) {
+    renderer = replaceOnce(renderer, forward.renderer.supported, `[...${forward.renderer.supported},${r.enum}.ChineseSimplified]`);
+    renderer = replaceOnce(renderer, forward.renderer.imports, `{[${r.enum}.ChineseSimplified]:async()=>import("./resources-zh-CN.js"),...${forward.renderer.imports}}`);
+  } else {
+    renderer = replaceOnce(renderer, `${r.supported}=[${r.enum}.English,${r.enum}.Japanese,`, `${r.supported}=[${r.enum}.English,${r.enum}.ChineseSimplified,${r.enum}.Japanese,`);
+    renderer = replaceOnce(renderer, `${r.imports}={[${r.enum}.Japanese]:`, `${r.imports}={[${r.enum}.ChineseSimplified]:async()=>await ${r.preload}(()=>import("./resources-zh-CN.js"),[],import.meta.url),[${r.enum}.Japanese]:`);
+  }
   // The vendor mounts its language preference observer only after sign-in.
   // Apply the same preference on startup so the signed-out screen is localized too.
   const mount = r.mount;
   const startup = `${pack.hardcoded ? localizedHelper(rendererHelper, 'eon', r.i18n) + badgeHelper(pack.hardcoded.badgeIds) + sourceHelper(pack.hardcoded.sourceIds) : ''}${r.i18n}();(async()=>{let timer;try{const p=await Promise.race([window.electronAPI?.i18n?.getPreference()??Promise.resolve(null),new Promise(r=>{timer=setTimeout(()=>r(null),4000)})]);if(p){const l=${r.resolve}({saved:p.savedLocale,candidates:p.systemLanguages,supported:${r.supported}});await ${r.switch}(l)&&${r.persist}(l)}}catch(e){${r.logger}("Failed to apply startup language",{cause:e})}finally{clearTimeout(timer)}${mount}})();`;
-  renderer = replaceOnce(renderer, `${r.i18n}();${mount}`, startup);
+  renderer = replaceOnce(renderer, forward?.renderer.startup ?? `${r.i18n}();${mount}`, startup);
   const rendererChunks = pack.hardcoded?.rendererChunks ?? [];
   if (!Array.isArray(rendererChunks) || new Set(rendererChunks).size !== rendererChunks.length) throw new Error('独立界面模块清单无效');
   const rendererDirectory = profile.files.renderer.path.slice(0, profile.files.renderer.path.lastIndexOf('/') + 1);
@@ -54,8 +60,13 @@ export function patchClient(asarBytes, exeBytes, profile, pack) {
   }
   let main = asar.read(profile.files.main.path).toString('utf8');
   main = applyHardcoded(main, profile.files.main.path, pack.hardcoded);
-  main = replaceOnce(main, `${m.supported}=[${m.enum}.English,${m.enum}.Japanese,`, `${m.supported}=[${m.enum}.English,${m.enum}.ChineseSimplified,${m.enum}.Japanese,`);
-  main = replaceOnce(main, `${m.resources}={[${m.enum}.English]:${m.englishRoot},`, `${m.resources}={[${m.enum}.ChineseSimplified]:${JSON.stringify(pack.desktop)},[${m.enum}.English]:${m.englishRoot},`);
+  if (forward) {
+    main = replaceOnce(main, forward.main.supported, `[...${forward.main.supported},${m.enum}.ChineseSimplified]`);
+    main = replaceOnce(main, forward.main.resources, `{[${m.enum}.ChineseSimplified]:${JSON.stringify(pack.desktop)},...${forward.main.resources}}`);
+  } else {
+    main = replaceOnce(main, `${m.supported}=[${m.enum}.English,${m.enum}.Japanese,`, `${m.supported}=[${m.enum}.English,${m.enum}.ChineseSimplified,${m.enum}.Japanese,`);
+    main = replaceOnce(main, `${m.resources}={[${m.enum}.English]:${m.englishRoot},`, `${m.resources}={[${m.enum}.ChineseSimplified]:${JSON.stringify(pack.desktop)},[${m.enum}.English]:${m.englishRoot},`);
+  }
   if (pack.hardcoded) main += `\n${localizedHelper(mainHelper, 'ne', m.i18n)}\n`;
   let html = asar.read(profile.files.html.path).toString('utf8');
   html = replaceOnce(html, 'var messages = {', `var messages = {"zh-CN":${JSON.stringify(pack.loader)},`);
@@ -64,7 +75,7 @@ export function patchClient(asarBytes, exeBytes, profile, pack) {
     [profile.files.renderer.path, Buffer.from(renderer)],
     [profile.files.main.path, Buffer.from(main)],
     [profile.files.html.path, Buffer.from(html)],
-    ['.vite/renderer/main_window/assets/resources-zh-CN.js', Buffer.from(`export const resources=${JSON.stringify(pack.resources)};\n`)],
+    [`${rendererDirectory}resources-zh-CN.js`, Buffer.from(`export const resources=${JSON.stringify(pack.resources)};\n`)],
     ['factory-zh-CN.manifest.json', Buffer.from(JSON.stringify({ version: pack.version, digest: pack.digest, clientVersion: profile.version }))],
   ]);
   for (const file of Object.keys(pack.hardcoded?.files ?? {})) {
