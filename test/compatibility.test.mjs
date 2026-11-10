@@ -9,7 +9,7 @@ import { discoverCompatibility, isForwardCompatible, reuseCatalog, buildCompatib
 import { flatten, parse } from '../tools/catalog.mjs';
 import { patchClient } from '../tools/patch.mjs';
 import { install, inspect, restore } from '../tools/install.mjs';
-import { loadTarget, loadReceiptProfile } from '../tools/versions.mjs';
+import { loadTarget, loadReceiptProfile, selectCompatibilityBaseline } from '../tools/versions.mjs';
 
 function fixture({ version = '1.9.7', renamed = false, extra = '', mutateSource = value => value, baselineVersion = '1.4.1', additionalFiles = {} } = {}) {
   const r = renamed ? '$q' : 'Lang', support = renamed ? '_a' : 'supported', init = renamed ? '$init' : 'initialize';
@@ -60,6 +60,28 @@ async function directory(t, fixture) {
 test('forward window accepts same-minor patches and +5 minors, and refuses +6, major, old and unstable versions', () => {
   for (const version of ['1.4.2', '1.4.999', '1.5.0', '1.9.0', '1.9.999']) assert.ok(isForwardCompatible(version), version);
   for (const version of ['1.4.1', '1.4.0', '1.3.1', '0.206.1', '1.10.0', '2.0.0', '1.5.0-beta.1', '1.5.0+build', '01.5.0', '1.5', '../1.5.0', '1.9007199254740992.0']) assert.equal(isForwardCompatible(version), false, version);
+});
+
+test('new exact profiles retain older compatibility windows and use the nearest available baseline', () => {
+  const versions = {
+    '1.4.2': '1.4.1', '1.4.999': '1.4.1', '1.5.0': '1.4.1', '1.6.0': '1.4.1',
+    '1.6.2': '1.6.1', '1.7.1': '1.7.0', '1.9.7': '1.7.0', '1.12.0': '1.7.0', '1.12.999': '1.7.0',
+  };
+  for (const [version, baseline] of Object.entries(versions)) assert.equal(selectCompatibilityBaseline(version), baseline, version);
+  for (const version of ['0.206.1', '1.3.1', '1.4.0', '1.13.0', '2.0.0', '1.8.0-beta.1', '1.8.0+build', '01.8.0']) {
+    assert.equal(selectCompatibilityBaseline(version), null, version);
+  }
+});
+
+test('target loading reuses the matching historical pack instead of requiring the latest baseline', async t => {
+  for (const [version, baselineVersion] of [['1.5.0', '1.4.1'], ['1.6.2', '1.6.1'], ['1.12.1', '1.7.0']]) {
+    const f = fixture({ version, baselineVersion }), root = await directory(t, f);
+    const target = await loadTarget(root, { verifyOfficial() {} });
+    assert.equal(target.profile.version, version);
+    assert.equal(target.profile.compatibility.baselineVersion, baselineVersion);
+    assert.equal(target.pack.compatibility.baselineVersion, baselineVersion);
+    assert.deepEqual(await readFile(join(root, 'resources/app.asar')), f.asar);
+  }
 });
 
 test('official trust checks require both a valid Authenticode signature and the Factory publisher', () => {

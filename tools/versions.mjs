@@ -4,8 +4,15 @@ import { readAsar, parseAsar, sha256 } from './asar.mjs';
 import { adapterDigest } from './patch.mjs';
 import { isForwardCompatible, verifyOfficialExecutable, verifyArchiveBinding, discoverCompatibility, buildCompatibilityPack } from './compatibility.mjs';
 
-export const supportedVersions = ['0.201.0', '0.202.0', '0.204.0', '0.205.0', '0.206.0', '1.3.0', '1.4.1'];
+export const supportedVersions = ['0.201.0', '0.202.0', '0.204.0', '0.205.0', '0.206.0', '1.3.0', '1.4.1', '1.6.1', '1.7.0'];
 export const latestVersion = supportedVersions.at(-1);
+
+export function selectCompatibilityBaseline(version) {
+  // Keep the original compatibility window when a newer exact profile is added.
+  // Earlier releases never shipped the source hashes needed for safe reuse.
+  return supportedVersions.slice(supportedVersions.indexOf('1.4.1'))
+    .findLast(baseline => isForwardCompatible(version, baseline)) ?? null;
+}
 
 export function packPath(version) {
   if (!supportedVersions.includes(version)) throw new Error(`暂未适配 Factory ${version}；支持 ${supportedVersions.join('、')}，未修改任何文件`);
@@ -61,7 +68,8 @@ export async function loadTarget(root, options = {}) {
   const version = JSON.parse(archive.read('package.json')).version;
   if (command === 'status' && saved?.profile.version === version) return { profile: saved.profile, compatibility: saved.receipt.compatibility, coverage: saved.receipt.coverage };
   if (supportedVersions.includes(version)) return { profile: await readProfile(version), ...(command === 'install' ? { pack: await loadPack(version) } : {}) };
-  if (!isForwardCompatible(version, latestVersion)) throw new Error(`暂未适配 Factory ${version}；精确支持 ${supportedVersions.join('、')}，前向兼容仅到 ${latestVersion.split('.').slice(0, 1)}.${Number(latestVersion.split('.')[1]) + 5}.x；未修改任何文件`);
+  const baselineVersion = selectCompatibilityBaseline(version);
+  if (!baselineVersion) throw new Error(`暂未适配 Factory ${version}；精确支持 ${supportedVersions.join('、')}，前向兼容仅到 ${latestVersion.split('.').slice(0, 1)}.${Number(latestVersion.split('.')[1]) + 5}.x；未修改任何文件`);
   let originals;
   if (saved?.profile.version === version) originals = saved.originals;
   else {
@@ -70,7 +78,7 @@ export async function loadTarget(root, options = {}) {
     (options.verifyOfficial ?? verifyOfficialExecutable)(exePath);
     if (sha256(await readFile(exePath)) !== sha256(originals.exe)) throw new Error('签名校验期间客户端文件发生变化');
   }
-  const { profile, catalogs } = discoverCompatibility(originals.asar, originals.exe, latestVersion);
-  const pack = buildCompatibilityPack(profile, catalogs, await loadPack(latestVersion));
+  const { profile, catalogs } = discoverCompatibility(originals.asar, originals.exe, baselineVersion);
+  const pack = buildCompatibilityPack(profile, catalogs, await loadPack(baselineVersion));
   return { profile, pack, compatibility: pack.compatibility, coverage: pack.coverage };
 }

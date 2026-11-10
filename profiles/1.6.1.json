@@ -1,0 +1,44 @@
+{
+  "version": "1.6.1",
+  "platform": "win32",
+  "arch": "x64",
+  "exeSha256": "e3d34923267fa152d09e2380aecdbe34e11463556f0c9f3382a4d8b0417c602e",
+  "asarSha256": "682833ad0ae0b6d5709afb693035ebccee657d51c64e224c88d52cf2380f511a",
+  "adapter": {
+    "renderer": {
+      "enum": "rp",
+      "supported": "gmt",
+      "imports": "MIf",
+      "i18n": "W3n",
+      "resolve": "Hfd",
+      "switch": "OIf",
+      "persist": "y8f",
+      "logger": "nt",
+      "englishRoot": "vWt",
+      "mount": "Ehs.createRoot(document.getElementById(\"root\")).render(c.jsx(yud,{env:HWt,children:c.jsx(cFf,{})}));",
+      "preload": "Vt",
+      "useTranslation": "ue"
+    },
+    "main": {
+      "enum": "Ee",
+      "supported": "a7",
+      "resources": "tL",
+      "englishRoot": "eL",
+      "i18n": "J"
+    }
+  },
+  "files": {
+    "renderer": {
+      "path": ".vite/renderer/main_window/assets/index-dsp1_4Oq.js",
+      "sha256": "d34142f6ad040c32d43cdf50015c02de5aebc2c2cf0af8816f87dab5e9a16834"
+    },
+    "main": {
+      "path": ".vite/build/initLifecycle-CzCb-L5h.js",
+      "sha256": "a884bf5ddc5995d6d06fea9f1aabe46ca3ff058c09fbc1c67830e688dcf2fdc6"
+    },
+    "html": {
+      "path": ".vite/renderer/main_window/index.html",
+      "sha256": "c94a9cb98f95386526fbec08731618b40eb80d15b164ecbedda4414ba70f0649"
+    }
+  }
+}

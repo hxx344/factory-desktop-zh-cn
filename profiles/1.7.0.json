@@ -1,0 +1,44 @@
+{
+  "version": "1.7.0",
+  "platform": "win32",
+  "arch": "x64",
+  "exeSha256": "a389dfae475aa3d46a51ffa7eb8c5d0dccb9d2b1f394252c7d48052ae80f807b",
+  "asarSha256": "b8d679a85caa80e2517a349be6c255a3f7783f7162978ea8828286c777f04595",
+  "adapter": {
+    "renderer": {
+      "enum": "sh",
+      "supported": "s0t",
+      "imports": "ZRf",
+      "i18n": "awn",
+      "resolve": "Qyd",
+      "switch": "t8f",
+      "persist": "UFf",
+      "logger": "tt",
+      "englishRoot": "EYt",
+      "mount": "u0s.createRoot(document.getElementById(\"root\")).render(c.jsx(ZAd,{env:YYt,children:c.jsx(LYf,{})}));",
+      "preload": "Wt",
+      "useTranslation": "ue"
+    },
+    "main": {
+      "enum": "Ee",
+      "supported": "G9",
+      "resources": "OL",
+      "englishRoot": "ML",
+      "i18n": "J"
+    }
+  },
+  "files": {
+    "renderer": {
+      "path": ".vite/renderer/main_window/assets/index-BrSLlbs2.js",
+      "sha256": "45827fa95cfb34484f2c28e088763a91c5382b060532c5f7fb9ee87083865f11"
+    },
+    "main": {
+      "path": ".vite/build/initLifecycle-CeUSFe40.js",
+      "sha256": "925f43f8803eca4b452f5f53c423f5a2bded83ed210e5b3515d9c37ed354b52f"
+    },
+    "html": {
+      "path": ".vite/renderer/main_window/index.html",
+      "sha256": "e48eeefa5b604c6f4dec5ef1dab28183bf66a69d8c73d5dd0dbc83090b5cd57b"
+    }
+  }
+}
