@@ -11,7 +11,7 @@ import { patchClient } from '../tools/patch.mjs';
 import { install, inspect, restore } from '../tools/install.mjs';
 import { loadTarget, loadReceiptProfile, selectCompatibilityBaseline } from '../tools/versions.mjs';
 
-function fixture({ version = '1.9.7', renamed = false, extra = '', mutateSource = value => value, baselineVersion = '1.4.1', additionalFiles = {} } = {}) {
+function fixture({ version = '1.9.7', renamed = false, extra = '', beforeMount = '', mutateSource = value => value, baselineVersion = '1.4.1', additionalFiles = {} } = {}) {
   const r = renamed ? '$q' : 'Lang', support = renamed ? '_a' : 'supported', init = renamed ? '$init' : 'initialize';
   const enumSource = `var ${r}=(e=>(e.English="en",e.Japanese="ja",e.ChineseSimplified="zh-CN",e.Korean="ko",e))(${r}||{});`;
   const renderer = `${enumSource}
@@ -24,7 +24,7 @@ async function change(l){const i=${init}();await i.changeLanguage(l);return true
 function persist(l){return l}
 async function observer(l){try{await change(l)&&persist(l)}catch(e){log("Failed to switch the app language",{cause:e})}}
 ${extra}
-${init}();
+${init}();${beforeMount}
 root.createRoot(document.getElementById("root")).render(view());`;
   const main = `${enumSource}const ${support}=[${r}.English,${r}.Japanese,${r}.Korean];const nativeEnglish={desktop:{save:"Save",unknown:"New menu"}};const nativeResources={[${r}.English]:nativeEnglish,[${r}.Japanese]:{}};ipc.handle("i18n:getLocalePreference",()=>{});`;
   const htmlPath = '.vite/renderer/main_window/index.html', rendererPath = `.vite/renderer/main_window/${renamed ? 'chunks/ui-renamed.js' : 'assets/index-new.js'}`, mainPath = `.vite/build/${renamed ? 'native-renamed' : 'lifecycle-new'}.js`;
@@ -66,16 +66,16 @@ test('new exact profiles retain older compatibility windows and use the nearest 
   const versions = {
     '1.4.2': '1.4.1', '1.4.999': '1.4.1', '1.5.0': '1.4.1', '1.6.0': '1.4.1',
     '1.6.2': '1.6.1', '1.7.1': '1.7.0', '1.8.0': '1.7.0', '1.8.999': '1.7.0',
-    '1.9.1': '1.9.0', '1.12.0': '1.9.0', '1.14.0': '1.9.0', '1.14.999': '1.9.0',
+    '1.9.1': '1.9.0', '1.9.999': '1.9.0', '1.10.1': '1.10.0', '1.14.0': '1.10.0', '1.15.999': '1.10.0',
   };
   for (const [version, baseline] of Object.entries(versions)) assert.equal(selectCompatibilityBaseline(version), baseline, version);
-  for (const version of ['0.206.1', '1.3.1', '1.4.0', '1.15.0', '2.0.0', '1.10.0-beta.1', '1.10.0+build', '01.10.0']) {
+  for (const version of ['0.206.1', '1.3.1', '1.4.0', '1.16.0', '2.0.0', '1.11.0-beta.1', '1.11.0+build', '01.11.0']) {
     assert.equal(selectCompatibilityBaseline(version), null, version);
   }
 });
 
 test('target loading reuses the matching historical pack instead of requiring the latest baseline', async t => {
-  for (const [version, baselineVersion] of [['1.5.0', '1.4.1'], ['1.6.2', '1.6.1'], ['1.8.0', '1.7.0'], ['1.14.1', '1.9.0']]) {
+  for (const [version, baselineVersion] of [['1.5.0', '1.4.1'], ['1.6.2', '1.6.1'], ['1.8.0', '1.7.0'], ['1.9.2', '1.9.0'], ['1.15.1', '1.10.0']]) {
     const f = fixture({ version, baselineVersion }), root = await directory(t, f);
     const target = await loadTarget(root, { verifyOfficial() {} });
     assert.equal(target.profile.version, version);
@@ -104,6 +104,40 @@ test('HTML entry and AST discovery tolerate renamed assets, minified bindings an
   assert.match(archive.read('.vite/renderer/main_window/chunks/resources-zh-CN.js').toString(), /保存/);
   assert.match(archive.read(f.mainPath).toString(), /New menu/);
   for (const path of [f.rendererPath, f.mainPath]) assert.doesNotThrow(() => parse(archive.read(path).toString(), { ecmaVersion: 'latest', sourceType: 'module' }));
+});
+
+test('a local startup hook runs once before asynchronous locale loading, including preference failure', async () => {
+  for (const rejectPreference of [false, true]) {
+    const f = fixture({ extra: 'function setup(){mark("hook")}', beforeMount: 'setup();' });
+    const { profile, catalogs } = f.discovered();
+    assert.equal(profile.adapter.renderer.beforeMount, 'setup');
+    assert.match(profile.compatibility.renderer.startup, /^initialize\(\);setup\(\);\s*root\.createRoot/);
+    const patched = parseAsar(patchClient(f.asar, f.exe, profile, buildCompatibilityPack(profile, catalogs, baseline())).asar);
+    const events = [];
+    let finishPreference;
+    const preference = new Promise((resolve, reject) => { finishPreference = rejectPreference ? reject : resolve; });
+    const completed = runInNewContext(patched.read(f.rendererPath).toString(), {
+      mark: value => events.push(value),
+      factory: () => ({ init() { events.push('init'); }, async changeLanguage() { events.push('language'); } }),
+      window: { electronAPI: { i18n: { getPreference() { events.push('preference'); return preference; } } } },
+      document: { getElementById: () => ({}) },
+      root: { createRoot: () => ({ render() { events.push('mount'); } }) },
+      view: () => ({}), log: () => events.push('error'), setTimeout, clearTimeout,
+    });
+    assert.deepEqual(events, ['init', 'hook', 'preference']);
+    finishPreference(rejectPreference ? new Error('preference unavailable') : { savedLocale: 'zh-CN', systemLanguages: ['en'] });
+    await completed;
+    assert.deepEqual(events, rejectPreference ? ['init', 'hook', 'preference', 'error', 'mount'] : ['init', 'hook', 'preference', 'init', 'language', 'mount']);
+  }
+});
+
+test('startup discovery refuses control flow, extra calls and unverified hook declarations', () => {
+  for (const beforeMount of ['setup(1);', 'holder.setup();', 'setup?.();', 'if(true)setup();', 'true&&setup();', '(setup(),setup());', 'await setup();', 'setup();setup();']) {
+    assert.throws(() => fixture({ extra: 'function setup(){}', beforeMount }).discovered(), /语言初始化与挂载关系改变/);
+  }
+  for (const extra of ['', 'async function setup(){}', 'function* setup(){}', 'function setup(value){}']) {
+    assert.throws(() => fixture({ extra, beforeMount: 'setup();' }).discovered(), /本地同步无参函数/);
+  }
 });
 
 test('compatibility keeps the original default language when saved and system preferences are absent', () => {

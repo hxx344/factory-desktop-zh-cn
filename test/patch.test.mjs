@@ -18,7 +18,7 @@ function fixture(version = '0.201.0') {
   const empty = { header: { files: {} }, bytes: Buffer.alloc(0), base: 0 };
   const files = {
     'package.json': JSON.stringify({ version }),
-    '.vite/renderer/main_window/assets/index.js': `const ${r.supported}=[${r.enum}.English,${r.enum}.Japanese,${r.enum}.Korean];const ${r.imports}={[${r.enum}.Japanese]:()=>1};${r.i18n}();${r.mount}`,
+    '.vite/renderer/main_window/assets/index.js': `const ${r.supported}=[${r.enum}.English,${r.enum}.Japanese,${r.enum}.Korean];const ${r.imports}={[${r.enum}.Japanese]:()=>1};${r.i18n}();${r.beforeMount ? `${r.beforeMount}();` : ''}${r.mount}`,
     '.vite/build/main.js': `const ${m.supported}=[${m.enum}.English,${m.enum}.Japanese,${m.enum}.Korean];const ${m.resources}={[${m.enum}.English]:${m.englishRoot},[${m.enum}.Japanese]:{desktop:{}}};`,
     '.vite/renderer/main_window/index.html': `<script>var messages = {en:[]};var locale = 'en';${version !== '0.201.0' ? 'globalThis.tips=messages[locale][4];globalThis.specMode=tips.specMode;' : ''}</script>`,
     'unrelated.bin': 'UNTOUCHED',
@@ -69,6 +69,15 @@ test('first install, no-op reinstall, pack update and exact restore preserve use
   assert.deepEqual(await readFile(join(root, 'factory-desktop.exe')), f.exe);
   assert.equal((await restore(root, f.profile, options)).state, 'unchanged');
   assert.equal(await readFile(join(root, 'user-settings.json'), 'utf8'), 'USER-DATA-KEEP');
+});
+
+test('exact startup hooks reject invalid identifiers and mismatched original anchors', () => {
+  const f = fixture('1.10.0');
+  assert.equal(f.profile.adapter.renderer.beforeMount, 'ILp');
+  for (const beforeMount of ['missingHook', 'ILp();unexpected']) {
+    const profile = { ...f.profile, adapter: { ...f.profile.adapter, renderer: { ...f.profile.adapter.renderer, beforeMount } } };
+    assert.throws(() => patchClient(f.asar, f.exe, profile, f.pack), /语言加载代码不匹配|未知适配绑定/);
+  }
 });
 
 test('a failed replacement rolls back the original pair, including during a pack update', async t => {

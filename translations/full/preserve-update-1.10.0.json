@@ -1,0 +1,6 @@
+{
+  "17650": "实际模型输入：renderer 的 $zu 将 workstreamMachineFixPrompt.intro 与 item.detail 和 instructions 拼接，再经 state.sendPrompt 发送给工作流会话；保留原始英文指令以避免汉化改变模型输入。",
+  "17651": "此字符串是实际发送给模型的机器修复指令，保留原始要求及路径插值。.local/1100-renderer.js:45064 的 $zu 将 workstreamMachineFixPrompt.instructions 与 intro/detail 拼成提示词；:45113 将 $zu 的返回值写入目标会话路由 state.sendPrompt。",
+  "17742": "筛选项显示格式仅由 facet 和 value 两个本地化插值及冒号构成，没有可独立翻译的文字。",
+  "17823": "纯插值格式：仅组合已本地化的 threads、comments 与中点分隔符，无可翻译自然语言，须原样保留占位符。"
+}

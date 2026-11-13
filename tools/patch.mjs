@@ -45,8 +45,9 @@ export function patchClient(asarBytes, exeBytes, profile, pack) {
   // The vendor mounts its language preference observer only after sign-in.
   // Apply the same preference on startup so the signed-out screen is localized too.
   const mount = r.mount;
-  const startup = `${pack.hardcoded ? localizedHelper(rendererHelper, 'eon', r.i18n) + badgeHelper(pack.hardcoded.badgeIds) + sourceHelper(pack.hardcoded.sourceIds) : ''}${r.i18n}();(async()=>{let timer;try{const p=await Promise.race([window.electronAPI?.i18n?.getPreference()??Promise.resolve(null),new Promise(r=>{timer=setTimeout(()=>r(null),4000)})]);if(p){const l=${r.resolve}({saved:p.savedLocale,candidates:p.systemLanguages,supported:${r.supported}});await ${r.switch}(l)&&${r.persist}(l)}}catch(e){${r.logger}("Failed to apply startup language",{cause:e})}finally{clearTimeout(timer)}${mount}})();`;
-  renderer = replaceOnce(renderer, forward?.renderer.startup ?? `${r.i18n}();${mount}`, startup);
+  const beforeMount = r.beforeMount ? `${r.beforeMount}();` : '';
+  const startup = `${pack.hardcoded ? localizedHelper(rendererHelper, 'eon', r.i18n) + badgeHelper(pack.hardcoded.badgeIds) + sourceHelper(pack.hardcoded.sourceIds) : ''}${r.i18n}();${beforeMount}(async()=>{let timer;try{const p=await Promise.race([window.electronAPI?.i18n?.getPreference()??Promise.resolve(null),new Promise(r=>{timer=setTimeout(()=>r(null),4000)})]);if(p){const l=${r.resolve}({saved:p.savedLocale,candidates:p.systemLanguages,supported:${r.supported}});await ${r.switch}(l)&&${r.persist}(l)}}catch(e){${r.logger}("Failed to apply startup language",{cause:e})}finally{clearTimeout(timer)}${mount}})();`;
+  renderer = replaceOnce(renderer, forward?.renderer.startup ?? `${r.i18n}();${beforeMount}${mount}`, startup);
   const rendererChunks = pack.hardcoded?.rendererChunks ?? [];
   if (!Array.isArray(rendererChunks) || new Set(rendererChunks).size !== rendererChunks.length) throw new Error('独立界面模块清单无效');
   const rendererDirectory = profile.files.renderer.path.slice(0, profile.files.renderer.path.lastIndexOf('/') + 1);

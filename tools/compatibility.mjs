@@ -105,8 +105,18 @@ function languageModule(source, renderer) {
     const mount = only(top.filter(node => node.type === 'ExpressionStatement' && node.expression.type === 'CallExpression' && member(node.expression.callee, 'render')
       && nodes(node.expression, child => child.type === 'CallExpression' && member(child.callee, 'createRoot')).length
       && nodes(node.expression, child => child.type === 'CallExpression' && member(child.callee, 'getElementById') && child.arguments[0]?.value === 'root').length), '应用挂载');
-    const previous = top[top.indexOf(mount) - 1];
-    if (previous?.type !== 'ExpressionStatement' || previous.expression.type !== 'CallExpression' || previous.expression.callee.name !== init.fn.id.name || previous.expression.arguments.length) fail('语言初始化与挂载关系改变');
+    const mountIndex = top.indexOf(mount);
+    const directCall = statement => statement?.type === 'ExpressionStatement' && statement.expression.type === 'CallExpression'
+      && statement.expression.callee.type === 'Identifier' && !statement.expression.optional && statement.expression.arguments.length === 0;
+    let previous = top[mountIndex - 1];
+    if (directCall(previous) && previous.expression.callee.name !== init.fn.id.name) {
+      const name = previous.expression.callee.name;
+      const helpers = functions.filter(fn => fn.id?.name === name && !fn.async && !fn.generator && fn.params.length === 0);
+      if (helpers.length !== 1) fail('挂载前调用不是唯一的本地同步无参函数');
+      result.beforeMount = name;
+      previous = top[mountIndex - 2];
+    }
+    if (!directCall(previous) || previous.expression.callee.name !== init.fn.id.name) fail('语言初始化与挂载关系改变');
     Object.assign(result, { imports: imports.id.name, i18n: init.fn.id.name, resolve: resolve.id.name, switch: switchFn.id.name, persist, logger, englishRoot, mount: source.slice(mount.start, mount.end) });
     Object.assign(anchors, { imports: source.slice(imports.init.start, imports.init.end), startup: source.slice(previous.start, mount.end) });
   } else {

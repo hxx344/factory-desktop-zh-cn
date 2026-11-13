@@ -1,0 +1,45 @@
+{
+  "version": "1.10.0",
+  "platform": "win32",
+  "arch": "x64",
+  "exeSha256": "ce764958e25f8c93042a5491316ff35a277968a7b05e2795dae54e55be2c714f",
+  "asarSha256": "2730fcead916f8b2921f4361e4822746aff8f7e1239fdbd745ff64b29b779a83",
+  "adapter": {
+    "renderer": {
+      "enum": "Bh",
+      "supported": "YCt",
+      "beforeMount": "ILp",
+      "imports": "Yyp",
+      "i18n": "RMn",
+      "resolve": "UZd",
+      "switch": "Xyp",
+      "persist": "C6p",
+      "logger": "et",
+      "englishRoot": "rrn",
+      "mount": "mMo.createRoot(document.getElementById(\"root\")).render(d.jsx(JJd,{env:Frn,children:d.jsx(_Lp,{})}));",
+      "preload": "on",
+      "useTranslation": "pe"
+    },
+    "main": {
+      "enum": "Ee",
+      "supported": "$9",
+      "resources": "o$",
+      "englishRoot": "n$",
+      "i18n": "X"
+    }
+  },
+  "files": {
+    "renderer": {
+      "path": ".vite/renderer/main_window/assets/index-DxZgV3k4.js",
+      "sha256": "acbfa86c328a1ca6362206debb0df01cbd33e96a9692b292d01e51998b8c95ed"
+    },
+    "main": {
+      "path": ".vite/build/initLifecycle-BJCVsZI4.js",
+      "sha256": "3677dba14b7d02e94d72bfe2b6521ba1f3e095fe30bfbf51b50d7128aaf242c8"
+    },
+    "html": {
+      "path": ".vite/renderer/main_window/index.html",
+      "sha256": "29f40092bc3f3136d8bec30d03a189d28a0729d8067dd33d229e4da2a006b86f"
+    }
+  }
+}

@@ -4,7 +4,7 @@ import { readAsar, parseAsar, sha256 } from './asar.mjs';
 import { adapterDigest } from './patch.mjs';
 import { isForwardCompatible, verifyOfficialExecutable, verifyArchiveBinding, discoverCompatibility, buildCompatibilityPack } from './compatibility.mjs';
 
-export const supportedVersions = ['0.201.0', '0.202.0', '0.204.0', '0.205.0', '0.206.0', '1.3.0', '1.4.1', '1.6.1', '1.7.0', '1.9.0'];
+export const supportedVersions = ['0.201.0', '0.202.0', '0.204.0', '0.205.0', '0.206.0', '1.3.0', '1.4.1', '1.6.1', '1.7.0', '1.9.0', '1.10.0'];
 export const latestVersion = supportedVersions.at(-1);
 
 export function selectCompatibilityBaseline(version) {
