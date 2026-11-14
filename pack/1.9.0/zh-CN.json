@@ -1,5 +1,5 @@
 {
-  "version": "0.4.3",
+  "version": "0.4.4",
   "clientVersion": "1.9.0",
   "locale": "zh-CN",
   "adapterSha256": "8ac5f4c69f5f4108eb4d3820f514d02cd07c8db17bebfe62f75a319e709d5889",
@@ -54859,6 +54859,6 @@
       "badgeTexts": 87
     }
   },
-  "inputsSha256": "74f1de300c66e4f9d97a80883b4cec9c8028878a05d684660c7a3107e554aedb",
-  "digest": "6568caa19a27c62a22a9a9aaf2246cfb9b267dc04b3f7dda2a54d79da27e70ae"
+  "inputsSha256": "fae3ab70c977c59bc81f2aaf79ef4fec8208212b312d85fe0f185318b6977996",
+  "digest": "dfcb9dc4ffd7fdab8d362f26d3c274944e6ae72b722ef1bdf8932ae6ccbd6a00"
 }

@@ -1,0 +1,45 @@
+{
+  "version": "1.12.1",
+  "platform": "win32",
+  "arch": "x64",
+  "exeSha256": "fcd8659f6dac42a151ca7ed534655be4b56677a851b4c509420eaa8da5ee100c",
+  "asarSha256": "ecef3c8dcd77b16fdb27196e3eaaceefc40fac71b618e2e49a5b764bb34a1cae",
+  "adapter": {
+    "renderer": {
+      "enum": "Lh",
+      "supported": "Lwt",
+      "beforeMount": "UGp",
+      "imports": "g4p",
+      "i18n": "AOn",
+      "resolve": "gau",
+      "switch": "A4p",
+      "persist": "hOp",
+      "logger": "Xe",
+      "englishRoot": "Rln",
+      "mount": "JPo.createRoot(document.getElementById(\"root\")).render(d.jsx(Eou,{env:dcn,children:d.jsx(zGp,{})}));",
+      "preload": "ln",
+      "useTranslation": "ue"
+    },
+    "main": {
+      "enum": "Ee",
+      "supported": "e7",
+      "resources": "I$",
+      "englishRoot": "_$",
+      "i18n": "X"
+    }
+  },
+  "files": {
+    "renderer": {
+      "path": ".vite/renderer/main_window/assets/index-c7f5C8Cw.js",
+      "sha256": "ccc244197de6e75368f28e348584e7abbb3506b81828100a440d247b40417079"
+    },
+    "main": {
+      "path": ".vite/build/initLifecycle-B1XjLjNl.js",
+      "sha256": "617922d3700a2b6397aadb8a2f9c04946a37fa399379eef315240ce3c35299df"
+    },
+    "html": {
+      "path": ".vite/renderer/main_window/index.html",
+      "sha256": "d7e3fcb025f67cd627b279952b486b42668823fd6d8846b444026389295c27c1"
+    }
+  }
+}

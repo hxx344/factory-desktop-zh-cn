@@ -66,16 +66,17 @@ test('new exact profiles retain older compatibility windows and use the nearest 
   const versions = {
     '1.4.2': '1.4.1', '1.4.999': '1.4.1', '1.5.0': '1.4.1', '1.6.0': '1.4.1',
     '1.6.2': '1.6.1', '1.7.1': '1.7.0', '1.8.0': '1.7.0', '1.8.999': '1.7.0',
-    '1.9.1': '1.9.0', '1.9.999': '1.9.0', '1.10.1': '1.10.0', '1.14.0': '1.10.0', '1.15.999': '1.10.0',
+    '1.9.1': '1.9.0', '1.9.999': '1.9.0', '1.10.1': '1.10.0', '1.11.0': '1.10.0', '1.12.0': '1.10.0',
+    '1.12.2': '1.12.1', '1.17.0': '1.12.1', '1.17.999': '1.12.1',
   };
   for (const [version, baseline] of Object.entries(versions)) assert.equal(selectCompatibilityBaseline(version), baseline, version);
-  for (const version of ['0.206.1', '1.3.1', '1.4.0', '1.16.0', '2.0.0', '1.11.0-beta.1', '1.11.0+build', '01.11.0']) {
+  for (const version of ['0.206.1', '1.3.1', '1.4.0', '1.18.0', '2.0.0', '1.13.0-beta.1', '1.13.0+build', '01.13.0']) {
     assert.equal(selectCompatibilityBaseline(version), null, version);
   }
 });
 
 test('target loading reuses the matching historical pack instead of requiring the latest baseline', async t => {
-  for (const [version, baselineVersion] of [['1.5.0', '1.4.1'], ['1.6.2', '1.6.1'], ['1.8.0', '1.7.0'], ['1.9.2', '1.9.0'], ['1.15.1', '1.10.0']]) {
+  for (const [version, baselineVersion] of [['1.5.0', '1.4.1'], ['1.6.2', '1.6.1'], ['1.8.0', '1.7.0'], ['1.9.2', '1.9.0'], ['1.12.0', '1.10.0'], ['1.17.1', '1.12.1']]) {
     const f = fixture({ version, baselineVersion }), root = await directory(t, f);
     const target = await loadTarget(root, { verifyOfficial() {} });
     assert.equal(target.profile.version, version);

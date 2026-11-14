@@ -9,7 +9,7 @@ import { parseArgs, isDeepStrictEqual } from 'node:util';
 export const REPOSITORY = 'hxx344/factory-desktop-zh-cn';
 export const OWNER_ID = 26082889;
 export const TITLE_PREFIX = 'Factory cloud request:';
-export const LIMITS = Object.freeze({ body: 4096, blob: 8 * 1024 * 1024, changedBytes: 32 * 1024 * 1024, changes: 300, entries: 5000, zip: 32 * 1024 * 1024, zipEntries: 200 });
+export const LIMITS = Object.freeze({ body: 4096, blob: 8 * 1024 * 1024, changedBytes: 32 * 1024 * 1024, changes: 300, entries: 5000, zip: 48 * 1024 * 1024, zipUncompressed: 48 * 1024 * 1024, zipEntries: 200 });
 const SHA = /^[a-f0-9]{40}$/;
 const VERSION = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(?:\+[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)?$/;
 const PROTECTED = new Set(['tools/cloud-bridge.mjs', 'test/cloud-bridge.test.mjs', 'tools/package.ps1', 'tools/package.mjs', 'test/package.test.mjs', 'tools/cloud-ui.ps1', 'tools/download-client.ps1', 'tools/cloud-native.mjs', 'test/cloud-native.test.mjs', 'docs/cloud-maintenance.md']);
@@ -254,7 +254,7 @@ export function readZip(bytes) {
     const dataOffset = localOffset + 30 + localNameLength + localExtraLength;
     check(dataOffset + compressed <= centralOffset, 'ZIP entry exceeds its data region.');
     unpacked += size;
-    check(unpacked <= LIMITS.changedBytes, 'ZIP uncompressed content exceeds 32 MiB.');
+    check(unpacked <= LIMITS.zipUncompressed, 'ZIP uncompressed content exceeds 48 MiB.');
     const packed = bytes.subarray(dataOffset, dataOffset + compressed);
     const contents = method === 0 ? Buffer.from(packed) : inflateRawSync(packed, { maxOutputLength: Math.max(1, size) });
     check(contents.length === size && crc32(contents) === crc, 'ZIP size or CRC mismatch.');

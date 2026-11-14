@@ -5,6 +5,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { parseArgs } from 'node:util';
 
 const VERSION = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
+const MAX_RELEASE_BYTES = 48 * 1024 * 1024;
 const FIXED_FILES = ['README.md', 'LICENSE', 'CHANGELOG.md', 'factory-zh.ps1', 'install.cmd', 'restore.cmd', 'status.cmd', 'pack/zh-CN.json', 'docs/screenshots/login-zh-CN.png', ...['cli', 'install', 'patch', 'hardcoded', 'asar', 'versions', 'compatibility', 'catalog'].map(name => `tools/${name}.mjs`)];
 const fail = message => { throw new Error(message); };
 const crcTable = Array.from({ length: 256 }, (_, value) => {
@@ -28,7 +29,7 @@ export function deterministicZip(entries) {
     names.add(path.toLowerCase());
     if (!Buffer.isBuffer(bytes) || bytes.length > 8 * 1024 * 1024) fail('Invalid release file size.');
     total += bytes.length;
-    if (total > 32 * 1024 * 1024) fail('Release content exceeds 32 MiB.');
+    if (total > MAX_RELEASE_BYTES) fail('Release content exceeds 48 MiB.');
     const name = Buffer.from(path, 'utf8'), crc = crc32(bytes);
     const header = Buffer.alloc(30);
     header.writeUInt32LE(0x04034b50, 0);
@@ -65,6 +66,7 @@ export function deterministicZip(entries) {
   footer.writeUInt16LE(entries.length, 10);
   footer.writeUInt32LE(directory.length, 12);
   footer.writeUInt32LE(offset, 16);
+  if (offset + directory.length + footer.length > MAX_RELEASE_BYTES) fail('Release ZIP exceeds 48 MiB.');
   return Buffer.concat([...local, directory, footer]);
 }
 

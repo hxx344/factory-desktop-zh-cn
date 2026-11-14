@@ -190,6 +190,19 @@ test('ZIP parsing validates stored and deflated entries including UTF-8 data', (
   }
 });
 
+test('compressed releases have a separate bounded expansion budget from candidate changes', () => {
+  const block = Buffer.alloc(7 * 1024 * 1024, 65);
+  const entries = Array.from({ length: 7 }, (_, i) => [`pack/${i}.json`, block]);
+  const accepted = zipFiles(entries.slice(0, 5), true);
+  assert(accepted.length < 1024 * 1024);
+  const unpacked = readZip(accepted);
+  assert.equal(unpacked.size, 5);
+  for (const value of unpacked.values()) assert(value.equals(block));
+  assert.throws(() => readZip(zipFiles(entries, true)), /uncompressed content exceeds 48 MiB/);
+  const candidate = new Map(entries.slice(0, 5).map(([path, bytes]) => [path, entry(path, sha, bytes.length)]));
+  assert.throws(() => changedFiles(new Map(), candidate), /32-MiB/);
+});
+
 test('ZIP parsing rejects traversal, duplicate names, corruption and oversize data', () => {
   assert.throws(() => readZip(zipFiles([['../payload', 'bad']])));
   assert.throws(() => readZip(zipFiles([['PACK/a', '1'], ['pack/A', '2']])));

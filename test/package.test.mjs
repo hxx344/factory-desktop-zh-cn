@@ -15,6 +15,22 @@ test('canonical ZIP keeps stable order and metadata while preserving UTF-8 conte
   for (const entry of entries) assert.deepEqual(decoded.get(entry.path), entry.bytes);
 });
 
+test('a multi-version release larger than 32 MiB round-trips without increasing single-file limits', () => {
+  const entries = Array.from({ length: 5 }, (_, i) => ({ path: `pack/${i}/zh-CN.json`, bytes: Buffer.alloc(7 * 1024 * 1024, 65 + i) }));
+  const zip = deterministicZip(entries);
+  assert(zip.length > 32 * 1024 * 1024 && zip.length <= 48 * 1024 * 1024);
+  const decoded = readZip(zip);
+  for (const entry of entries) assert(decoded.get(entry.path).equals(entry.bytes));
+  assert.throws(() => deterministicZip([{ path: 'pack/large.json', bytes: Buffer.alloc(8 * 1024 * 1024 + 1) }]), /file size/);
+});
+
+test('the release byte ceiling includes archive metadata and rejects oversized payloads', () => {
+  const bytes = Buffer.alloc(8 * 1024 * 1024);
+  const entries = Array.from({ length: 6 }, (_, i) => ({ path: `pack/${i}.json`, bytes }));
+  assert.throws(() => deterministicZip(entries), /ZIP exceeds 48 MiB/);
+  assert.throws(() => deterministicZip([...entries, { path: 'pack/extra.json', bytes: Buffer.from('x') }]), /content exceeds 48 MiB/);
+});
+
 test('fresh packaging after all source mtimes change produces identical retry assets', async t => {
   const temp = await mkdtemp(join(tmpdir(), 'factory-package-test-'));
   t.after(() => rm(temp, { recursive: true, force: true }));
