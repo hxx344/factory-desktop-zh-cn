@@ -1,0 +1,45 @@
+{
+  "version": "1.13.0",
+  "platform": "win32",
+  "arch": "x64",
+  "exeSha256": "29949a3d908153ba991114321a95d038db6dad088755e37242812994bc5637b7",
+  "asarSha256": "3cd740944404f6e758165f05ab0c35176dac79b7bacda88f75bd9bb9810898cf",
+  "adapter": {
+    "renderer": {
+      "enum": "Qh",
+      "supported": "Rxt",
+      "beforeMount": "Zch",
+      "imports": "Ojp",
+      "i18n": "wFn",
+      "resolve": "Uyu",
+      "switch": "Ljp",
+      "persist": "JJp",
+      "logger": "Xe",
+      "englishRoot": "Gfn",
+      "mount": "Izo.createRoot(document.getElementById(\"root\")).render(d.jsx(Nvu,{env:Epn,children:d.jsx(idh,{})}));",
+      "preload": "dn",
+      "useTranslation": "fe"
+    },
+    "main": {
+      "enum": "Ee",
+      "supported": "d7",
+      "resources": "hF",
+      "englishRoot": "fF",
+      "i18n": "Z"
+    }
+  },
+  "files": {
+    "renderer": {
+      "path": ".vite/renderer/main_window/assets/index-Cc0SY1Ue.js",
+      "sha256": "fa2ddf8df6f1c0f5a5a394baa77774e93963cc52bdd37f1621ad5ea74ea582c1"
+    },
+    "main": {
+      "path": ".vite/build/initLifecycle-COpPBZg8.js",
+      "sha256": "65548922726795cfa6193a5b307c4efa3533736b8e115d37f66c624975ffea0c"
+    },
+    "html": {
+      "path": ".vite/renderer/main_window/index.html",
+      "sha256": "2c281c150891b15c276eb22b6ff0e5578e2373586f94aa643bf6b911a166713e"
+    }
+  }
+}
