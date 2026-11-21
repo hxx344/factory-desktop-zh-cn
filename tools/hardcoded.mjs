@@ -10,6 +10,9 @@ export function hardcodedExpression(entry) {
     return `__factoryZhBadge(${JSON.stringify(entry.field)},${entry.raw})`;
   }
   if (entry.lookup === 'source') return `__factoryZhSource(${entry.raw})`;
+  if (entry.lookup === 'emoji') {
+    return `(v=>{const key="emoji: "+v,label=__factoryZhSource(key);return label===key?v:label})(${entry.raw})`;
+  }
   if (entry.runtime === 'early') {
     if (!/^[A-Za-z_$][\w$]*$/.test(entry.electron ?? '') || typeof entry.translation !== 'string') throw new Error('Invalid early-startup localization entry');
     return `(()=>{try{const l=${entry.electron}.app.getPreferredSystemLanguages()[0];if(/^zh(?:-|$)/i.test(l))return ${JSON.stringify(entry.translation)}}catch{}return ${entry.raw}})()`;

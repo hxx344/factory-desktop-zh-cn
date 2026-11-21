@@ -94,7 +94,7 @@ for (const entry of hardcodedProfile.entries) {
     if (!entry.reason?.trim()) throw new Error(`硬编码保留项缺少审核说明：${entry.file}:${entry.start}`);
     continue;
   }
-  if (entry.lookup === 'badge' || entry.lookup === 'source') { hardcoded.entries.push(entry); continue; }
+  if (['badge', 'source', 'emoji'].includes(entry.lookup)) { hardcoded.entries.push(entry); continue; }
   if (entry.decision !== 'translated' || full.translations[entry.id] === undefined) throw new Error(`存在未处理硬编码：${entry.file}:${entry.start}`);
   if (full.inventory.sources[entry.id].sha256 !== entry.sourceHash) throw new Error('硬编码源文指纹不匹配');
   const text = full.translations[entry.id];

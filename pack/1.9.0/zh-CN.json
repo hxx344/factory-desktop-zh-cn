@@ -1,8 +1,8 @@
 {
-  "version": "0.4.5",
+  "version": "0.4.6",
   "clientVersion": "1.9.0",
   "locale": "zh-CN",
-  "adapterSha256": "8ac5f4c69f5f4108eb4d3820f514d02cd07c8db17bebfe62f75a319e709d5889",
+  "adapterSha256": "67f7c3959b6eb60b652a8f73f87998c4ed3973258d63216a8f08b998c9091eea",
   "hardcoded": {
     "files": {
       ".vite/build/index-B9GbgqVe.js": "021db85cec87724463a7937db9743f1db0320c7cd5037b5077e9ef45b31ffe00",
@@ -54859,6 +54859,6 @@
       "badgeTexts": 87
     }
   },
-  "inputsSha256": "f51aae7cd2d0d4d37286615f04d8e31319d3563fc09e7d6010c5c8f2291a9212",
-  "digest": "648ddd094a40c21bffc78213fd252e7a22b58c63422d061d06c4af44b00e52e5"
+  "inputsSha256": "8227932036460cd87fba9983d909b8ee2952ca7151d4215ef9f122e263b4c57a",
+  "digest": "9ed9e036d345b07594130ca9182ee1ce78e73ebb06f2ff417d414873ad70d76e"
 }

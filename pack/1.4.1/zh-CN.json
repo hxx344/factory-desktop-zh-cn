@@ -1,8 +1,8 @@
 {
-  "version": "0.4.5",
+  "version": "0.4.6",
   "clientVersion": "1.4.1",
   "locale": "zh-CN",
-  "adapterSha256": "8ac5f4c69f5f4108eb4d3820f514d02cd07c8db17bebfe62f75a319e709d5889",
+  "adapterSha256": "67f7c3959b6eb60b652a8f73f87998c4ed3973258d63216a8f08b998c9091eea",
   "hardcoded": {
     "files": {
       ".vite/build/index-DhtbDDlq.js": "1cba7d95a461c71dcc6fd27cb288078145a6ee8c4a473d1519385fd1f24559a3",
@@ -52143,6 +52143,6 @@
       "badgeTexts": 87
     }
   },
-  "inputsSha256": "792627b416cfdbaa59c8ce077bb654654bd8dd30a5891af0c35884e8c354d9cc",
-  "digest": "973487f2d0268075edab8e758ed8572381f7ce3859f352c05926a997c93545ba"
+  "inputsSha256": "7410ab8a8bb4e072014f89e91d597aac4f78f46ce88d27a5a323117a4a8b9022",
+  "digest": "f4df8f4a0c86221ff83d5d9faa18d3d4d11c73f8da51a3f4bace3aeed89bbfd1"
 }

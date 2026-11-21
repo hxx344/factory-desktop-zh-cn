@@ -1,0 +1,45 @@
+{
+  "version": "1.17.0",
+  "platform": "win32",
+  "arch": "x64",
+  "exeSha256": "2369b768df2497be491cd3fa991da205e17838eaa3853f7648d06a8a624d323f",
+  "asarSha256": "41234f2860a8f290afd529d52f73dd5fda7508c402ba6af491bc354cf21a7438",
+  "adapter": {
+    "renderer": {
+      "enum": "Dg",
+      "supported": "WTt",
+      "beforeMount": "o5f",
+      "imports": "Fyf",
+      "i18n": "ijn",
+      "resolve": "x$u",
+      "switch": "$yf",
+      "persist": "f4h",
+      "logger": "Je",
+      "englishRoot": "Uhn",
+      "mount": "Uor.createRoot(document.getElementById(\"root\")).render(d.jsx(FSa,{env:VAn,children:d.jsx(t9h,{})}));",
+      "preload": "vn",
+      "useTranslation": "pe"
+    },
+    "main": {
+      "enum": "Ee",
+      "supported": "Uv",
+      "resources": "hU",
+      "englishRoot": "fU",
+      "i18n": "Z"
+    }
+  },
+  "files": {
+    "renderer": {
+      "path": ".vite/renderer/main_window/assets/index-CZCvs_cY.js",
+      "sha256": "cf3e1343e9d50dda0bc9ad184c07bbd93699cbfdcca9dbaaf25ef1341b44e5ab"
+    },
+    "main": {
+      "path": ".vite/build/initLifecycle-XcWJaDLn.js",
+      "sha256": "13f81d7b2104345e6035aefc567d488b166761c994dac8b7315cf3e9c584c81c"
+    },
+    "html": {
+      "path": ".vite/renderer/main_window/index.html",
+      "sha256": "33aa9a4712eaac2942e43b76e77d8435b0a918ddbbb4890f8225449c25573045"
+    }
+  }
+}

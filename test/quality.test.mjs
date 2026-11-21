@@ -103,6 +103,24 @@ test('source display lookup translates only known UI values and leaves source ma
   assert.equal(context.__factoryZhSource('user-authored text'), 'user-authored text');
 });
 
+test('emoji labels use their own translations without modifying the search data', () => {
+  let language = 'zh-CN';
+  const labels = { '1': '未知用户', '2': '幽灵' };
+  const context = { eon: () => ({ t: (key, { defaultValue }) => language === 'zh-CN' ? labels[key.split(':')[1]] ?? defaultValue : defaultValue }) };
+  const source = 'function display(entry){return entry.description}globalThis.display=display;';
+  const raw = 'entry.description';
+  const start = source.indexOf(raw);
+  const manifest = { files: { renderer: textHash(source) }, entries: [{ file: 'renderer', start, end: start + raw.length, raw, runtime: 'renderer', lookup: 'emoji' }] };
+  runInNewContext(`${rendererHelper}${sourceHelper({ ghost: '1', 'emoji: ghost': '2' })}${applyHardcoded(source, 'renderer', manifest)}`, context);
+  const entry = { description: 'ghost', names: ['ghost'], emoji: '👻' };
+  assert.equal(context.display(entry), '幽灵');
+  assert.equal(context.__factoryZhSource('ghost'), '未知用户');
+  assert.deepEqual(entry, { description: 'ghost', names: ['ghost'], emoji: '👻' });
+  assert.equal(context.display({ description: '🫠' }), '🫠');
+  language = 'en';
+  assert.equal(context.display(entry), 'ghost');
+});
+
 test('reviewed display templates preserve inserted values and leave original model descriptions unchanged', () => {
   const description = 'Choose the model for {{expression0}}-complexity Task tool subagents.';
   let language = 'zh-CN';
