@@ -1,8 +1,8 @@
 {
-  "version": "0.4.6",
+  "version": "0.4.7",
   "clientVersion": "1.7.0",
   "locale": "zh-CN",
-  "adapterSha256": "67f7c3959b6eb60b652a8f73f87998c4ed3973258d63216a8f08b998c9091eea",
+  "adapterSha256": "b03fd7de62c79968436a5ad7952506c8fcb8eb3dac0bb9123d7584ffe496816f",
   "hardcoded": {
     "files": {
       ".vite/build/index-CETGRs2M.js": "a532216ac9b0898f794057dd698c5db012b6cbc202b5c24aab7b233843442886",
@@ -53410,6 +53410,6 @@
       "badgeTexts": 87
     }
   },
-  "inputsSha256": "ed88780fe730ab1020552c314d7b441784e515f2eaf985523b5de60310fa9df9",
-  "digest": "381231557d8decb89c035156043ad0a37e590ba6e4f226497508c85fbce6ec61"
+  "inputsSha256": "0caea4305b3c4fb7a07de4e757802a18c1b83bd81352733aee60d5daa6dfacd6",
+  "digest": "9d3938bfb8dc988719789c18bac031473bae592768432dae8ec6fff32fcb1331"
 }

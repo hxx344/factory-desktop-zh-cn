@@ -1,8 +1,8 @@
 {
-  "version": "0.4.6",
+  "version": "0.4.7",
   "clientVersion": "0.205.0",
   "locale": "zh-CN",
-  "adapterSha256": "67f7c3959b6eb60b652a8f73f87998c4ed3973258d63216a8f08b998c9091eea",
+  "adapterSha256": "b03fd7de62c79968436a5ad7952506c8fcb8eb3dac0bb9123d7584ffe496816f",
   "hardcoded": {
     "files": {
       ".vite/build/index-6kbj_fUN.js": "aff64bd7a8ea1f923fb9f12fd16bfaa7304181623ee43a98bccd47e3ca21d2d6",
@@ -32936,6 +32936,6 @@
       "badgeTexts": 87
     }
   },
-  "inputsSha256": "ad9e0c273a84bd96061c4506c88db6e5c9ffdb4f80a19851bffbaf6a4f728305",
-  "digest": "3eab686767ec36da316c69718d212e7de15f4922dbbfb9dcac97cc32e7ca7445"
+  "inputsSha256": "d60f862afdac90afea7ce2df8b5d3f2695051cf03ecc21775766e8bebd86baf3",
+  "digest": "b96b18c07af8635dd024d71752c3343f8cf2b77e6d55f45e252eb85d019bf115"
 }

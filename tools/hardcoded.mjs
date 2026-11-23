@@ -19,6 +19,9 @@ export function hardcodedExpression(entry) {
   }
   const call = callFor(entry);
   const key = JSON.stringify(entry.id);
+  if (entry.matchSource !== undefined) {
+    return `(v=>v===${JSON.stringify(entry.matchSource)}?${call}(${key},v):v)(${entry.raw})`;
+  }
   if (entry.expressions?.length) {
     const values = entry.expressions.map((_, index) => `expression${index}:v[${index}]`).join(',');
     const fallback = entry.quasis.map((part, index) => JSON.stringify(part) + (index < entry.expressions.length ? `+String(v[${index}])+` : '')).join('');

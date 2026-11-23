@@ -97,6 +97,7 @@ for (const entry of hardcodedProfile.entries) {
   if (['badge', 'source', 'emoji'].includes(entry.lookup)) { hardcoded.entries.push(entry); continue; }
   if (entry.decision !== 'translated' || full.translations[entry.id] === undefined) throw new Error(`存在未处理硬编码：${entry.file}:${entry.start}`);
   if (full.inventory.sources[entry.id].sha256 !== entry.sourceHash) throw new Error('硬编码源文指纹不匹配');
+  if (entry.matchSource !== undefined && (typeof entry.matchSource !== 'string' || textHash(entry.matchSource) !== entry.sourceHash)) throw new Error('显示文本与登记的原文不匹配');
   const text = full.translations[entry.id];
   if (entry.runtime === 'renderer') resources.hardcoded[entry.id] = text;
   else if (entry.runtime === 'main') desktop.desktop.hardcoded[entry.id] = text;

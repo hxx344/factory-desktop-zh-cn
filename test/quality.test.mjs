@@ -103,6 +103,25 @@ test('source display lookup translates only known UI values and leaves source ma
   assert.equal(context.__factoryZhSource('user-authored text'), 'user-authored text');
 });
 
+test('machine descriptions translate the built-in default only at display time', () => {
+  const original = 'Default computer description';
+  const source = 'function display(row){return row.description}globalThis.display=display;';
+  const raw = 'row.description';
+  const start = source.indexOf(raw);
+  const entry = { file: 'renderer', start, end: start + raw.length, raw, runtime: 'renderer', id: '1', matchSource: original };
+  const manifest = { files: { renderer: textHash(source) }, entries: [entry] };
+  let language = 'zh-CN', reads = 0;
+  const context = { eon: () => ({ t: (_, { defaultValue }) => language === 'zh-CN' ? '默认计算机描述' : defaultValue }) };
+  runInNewContext(`${rendererHelper}${applyHardcoded(source, 'renderer', manifest)}`, context);
+  const row = { get description() { reads++; return original; } };
+  assert.equal(context.display(row), '默认计算机描述');
+  assert.equal(reads, 1);
+  for (const description of ['LS', '', original + ' (custom)', undefined]) assert.equal(context.display({ description }), description);
+  language = 'en';
+  assert.equal(context.display(row), original);
+  assert.equal(reads, 2);
+});
+
 test('emoji labels use their own translations without modifying the search data', () => {
   let language = 'zh-CN';
   const labels = { '1': '未知用户', '2': '幽灵' };

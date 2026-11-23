@@ -1,0 +1,45 @@
+{
+  "version": "1.17.2",
+  "platform": "win32",
+  "arch": "x64",
+  "exeSha256": "346a2f38b0d137f03f2068975a0476050e474aea7f8c26bfa846d419bd3109ab",
+  "asarSha256": "06b534fe42cf987653ce843126c2dcf2ea8b7cf0d5ed49160939d2b8e23fa5cf",
+  "adapter": {
+    "renderer": {
+      "enum": "Dg",
+      "supported": "o6t",
+      "beforeMount": "dkf",
+      "imports": "zyf",
+      "i18n": "yjn",
+      "resolve": "kHu",
+      "switch": "qyf",
+      "persist": "H4h",
+      "logger": "Je",
+      "englishRoot": "Zhn",
+      "mount": "Zor.createRoot(document.getElementById(\"root\")).render(d.jsx(tCa,{env:ovn,children:d.jsx(M9h,{})}));",
+      "preload": "yn",
+      "useTranslation": "pe"
+    },
+    "main": {
+      "enum": "Ee",
+      "supported": "Uv",
+      "resources": "hU",
+      "englishRoot": "fU",
+      "i18n": "Z"
+    }
+  },
+  "files": {
+    "renderer": {
+      "path": ".vite/renderer/main_window/assets/index-CpTSw6Pe.js",
+      "sha256": "ce785a6c8d6493bf565ef2e1a5bc585d01ffb12d10e3bf6d76528b149fc069f5"
+    },
+    "main": {
+      "path": ".vite/build/initLifecycle-JJFNG5ns.js",
+      "sha256": "5b27485ccb682d811a95049ac3a17b0983e92c7cb5d9810a9335204180b0f5ad"
+    },
+    "html": {
+      "path": ".vite/renderer/main_window/index.html",
+      "sha256": "4f5e0a73a9e518715ccd2c8517a0129546781f313844bec45f212a4f45fc21e0"
+    }
+  }
+}
