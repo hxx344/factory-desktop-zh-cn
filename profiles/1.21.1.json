@@ -1,0 +1,45 @@
+{
+  "version": "1.21.1",
+  "platform": "win32",
+  "arch": "x64",
+  "exeSha256": "c1337745f36c56e088f264acb60bc2f4de84ba9d3feba30087fd2c386ce58c20",
+  "asarSha256": "70bd0800a2dda63c47dce2923a155e7ff951c0ffcfaf066522f9fb4c0fd3f24a",
+  "adapter": {
+    "renderer": {
+      "enum": "Jg",
+      "supported": "x7t",
+      "beforeMount": "wUf",
+      "imports": "qRf",
+      "i18n": "wHn",
+      "resolve": "Trf",
+      "switch": "VRf",
+      "persist": "eqh",
+      "logger": "nt",
+      "englishRoot": "D0n",
+      "mount": "Qmr.createRoot(document.getElementById(\"root\")).render(d.jsx(R6a,{env:Jbn,children:d.jsx(osg,{})}));",
+      "preload": "Cn",
+      "useTranslation": "fe"
+    },
+    "main": {
+      "enum": "Ee",
+      "supported": "Sv",
+      "resources": "MF",
+      "englishRoot": "PF",
+      "i18n": "Z"
+    }
+  },
+  "files": {
+    "renderer": {
+      "path": ".vite/renderer/main_window/assets/index-DLZsi7k3.js",
+      "sha256": "e706c75fe9354f79562ccfb7cc93e7d0707c0c028ebe301df6f4fa246885b17e"
+    },
+    "main": {
+      "path": ".vite/build/initLifecycle-CfEOdrIS.js",
+      "sha256": "93ea16f2dd2a97442c9623392a6497a8d399803f985f019f41b3c5cddb68d40d"
+    },
+    "html": {
+      "path": ".vite/renderer/main_window/index.html",
+      "sha256": "287f43e02ddb296a914fe28886a53f88fdc5ee2edf58e739f3775abdfc873fff"
+    }
+  }
+}
